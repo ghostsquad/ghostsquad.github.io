@@ -41,14 +41,12 @@ repo_dir="$( cd "$( dirname "$0" )" && pwd )"
     if [ -n "$*" ]; then
         msg="$*"
     fi
-    git commit -m "$msg"
 
     echo "Updating master branch"
     (
         cd public
         git add --all
         git commit -m "$msg"
-
     )
 
     echo "Pushing to github"
