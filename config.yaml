@@ -1,0 +1,43 @@
+baseURL: https://ghostsquad.github.io
+languageCode: en-us
+defaultContentLanguage: en
+title: ghostsquad blog
+theme: hermit
+pygmentsCodefences: true
+pygmentsUseClasses: true
+rssLimit: 10
+copyright: >-
+  This work is licensed under a Creative Commons Attribution-NonCommercial 4.0
+  International License.
+enableEmoji: true
+author:
+  name: John Doe
+blackfriday: {}
+taxonomies:
+  tag: tags
+params:
+  dateform: "Jan 2, 2006"
+  dateformShort: Jan 2
+  dateformNum: "2006-01-02"
+  dateformNumTime: "2006-01-02 15:04 -0700"
+  themeColor: "#494f5c"
+  homeSubtitle: A minimal and fast theme for Hugo.
+  footerCopyright: ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
+  justifyContent: false
+  relatedPosts: false
+  code_copy_button: true
+  social:
+    - name: twitter
+      url: "https://twitter.com/"
+    - name: instagram
+      url: "https://instagram.com/"
+    - name: github
+      url: "https://github.com/"
+menu:
+  main:
+    - name: Posts
+      url: posts/
+      weight: 10
+    - name: About
+      url: about-hugo/
+      weight: 20
