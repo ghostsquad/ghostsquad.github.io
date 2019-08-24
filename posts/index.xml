@@ -1,0 +1,78 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Posts on ghostsquad blog</title>
+		<link>https://ghostsquad.github.io/posts/</link>
+		<description>Recent content in Posts on ghostsquad blog</description>
+		<generator>Hugo -- gohugo.io</generator>
+		<language>en-us</language>
+		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+		<lastBuildDate>Fri, 23 Aug 2019 18:44:31 -0700</lastBuildDate>
+		<atom:link href="https://ghostsquad.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>The Little Things</title>
+			<link>https://ghostsquad.github.io/posts/the-little-things/</link>
+			<pubDate>Fri, 23 Aug 2019 18:44:31 -0700</pubDate>
+			
+			<guid>https://ghostsquad.github.io/posts/the-little-things/</guid>
+			<description>One thing I&amp;rsquo;ve noticed over the years is that the little things in software development often get overlooked as &amp;ldquo;bike shedding&amp;rdquo; moments, and yet there&amp;rsquo;s significant value in establishing a standard, convention, and even automation around these overlooked things. Let&amp;rsquo;s dive right in:
+Git Commits Following conventional commits standards can allow you to do things like:
+ Automatically generate CHANGELOGs Automatically determine semantic version bump Communicate nature of changes to teammates, public, stakeholders Used to change build pipeline behavior at runtime to publish code automatically Enhance readability of git commit history  I&amp;rsquo;m in the SRE/DevOps/PaaS space, and I often find myself wishing I had more time to write weekly newsletters or similar communications to internal teams to increase the visibility of the new features, bugfixes, and other changes that are being delivered.</description>
+			<content type="html"><![CDATA[
+
+<p>One thing I&rsquo;ve noticed over the years is that the little things in software development often get overlooked as &ldquo;bike shedding&rdquo; moments, and yet there&rsquo;s significant value in establishing a standard, convention, and even automation around these overlooked things. Let&rsquo;s dive right in:</p>
+
+<h3 id="git-commits">Git Commits</h3>
+
+<p>Following <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/">conventional commits</a> standards can allow you to do things like:</p>
+
+<ol>
+<li>Automatically generate CHANGELOGs</li>
+<li>Automatically determine semantic version bump</li>
+<li>Communicate nature of changes to teammates, public, stakeholders</li>
+<li>Used to change build pipeline behavior at runtime to publish code automatically</li>
+<li>Enhance readability of git commit history</li>
+</ol>
+
+<p>I&rsquo;m in the SRE/DevOps/PaaS space, and I often find myself wishing I had more time to write weekly newsletters  or similar communications to internal teams to increase the visibility of the new features, bugfixes, and other changes that are being delivered. This includes beta releases, and getting volunteers to provide feedback on tools/services before distributing them to the wider engineering organization. With this said, I cannot overstate the value of #1 and #3 in the above list. I don&rsquo;t mean a <a href="https://about.gitlab.com/releases/">hard-to-read, never-ending list</a> either. Imagine being able to <em>generate</em> a releases page like <a href="https://about.gitlab.com/2019/08/22/gitlab-12-2-released/index.html">Gitlab&rsquo;s 12.2 release</a>. This is theoretically possible through a combination of well-written commits (that are machine parseable) and well-written epics, that can be queried.</p>
+
+<p>Combine this with <a href="https://chris.beams.io/posts/git-commit/#seven-rules">Chris Beams&rsquo;: How to Write a Git Commit Message</a> and it makes it trivial to go back in time an figure out why something was done.</p>
+
+<h3 id="project-structure-naming">Project Structure &amp; Naming</h3>
+
+<p>Conventions over Configuration. This applies to a project directory structure &amp; naming too. Here&rsquo;s some benefits of coming up with and sticking to a polyglot convention, similar to <a href="https://github.com/golang-standards/project-layout">Go project structure recommendations</a>.</p>
+
+<ol>
+<li>CI/CD templated/generated pipelines
+
+<ul>
+<li>If your project name is valid DNS (and all lowercase), it makes it easy to use (without modification) as your kubernetes namespace (or namespace prefix).</li>
+<li><code>Dockerfile</code> in the root of your repo? We have a pre-baked step to build/publish without any additional configuration.</li>
+<li>Using <code>make</code>? A standard pipeline can make some assumptions for you about commands to run without requiring explicit configuration.</li>
+</ul></li>
+<li>Enhance readability &amp; maintenance by teammates and external teams. Sticking to a convention means that someone doesn&rsquo;t need to learn &ldquo;how <em>your</em> repo does it&rdquo;.</li>
+<li>New projects can be <a href="https://github.com/facebook/create-react-app">templatized/generated</a>. If you have the pleasure of being able to spinup &amp; deploy greenfield applications on a regular basis, this becomes an automatable step.</li>
+</ol>
+
+<h3 id="tags-labels-annotations">Tags, Labels, Annotations</h3>
+
+<p>Again, this is all about automation. It makes sense to have a standard set of keys and a convention for custom keys that are forward compatible with changes to the standard. Use this same standard for your cloud provider, like AWS, as well as Kubernetes resources.</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">company.io/environment<span class="p">:</span><span class="w"> </span>prd<span class="w">
+</span><span class="w"></span>company.io/team<span class="p">:</span><span class="w"> </span>sig-api<span class="w">
+</span><span class="w"></span>company.io/contact<span class="p">:</span><span class="w"> </span>sig-api@company.io<span class="w">
+</span><span class="w"></span>company.io/managed-by<span class="p">:</span><span class="w"> </span>terraform<span class="w">
+</span><span class="w"></span>company.io/fingerprint<span class="p">:</span><span class="w"> </span>abc123<span class="w">
+</span><span class="w"></span>company.io/fingerprint-type<span class="p">:</span><span class="w"> </span>sha1<span class="w">
+</span><span class="w"></span>company.io/component<span class="p">:</span><span class="w"> </span>database<span class="w">
+</span><span class="w"></span>company.io/part-of<span class="p">:</span><span class="w"> </span>wordpress<span class="w">
+</span><span class="w"></span>custom.company.io/something-not-standard<span class="p">:</span><span class="w"> </span>this-is-project-or-team-specific</code></pre></div>
+<p><a href="https://dev.to/jeroendedauw/the-fallacy-of-dry">Dry is an anti-pattern</a>. Some of these are duplicates of <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/">recommended annotations/labels for kubernetes</a>. Don&rsquo;t worry about duplication. Use them both, because you&rsquo;ll apply the ones above to more things than just K8s resources. Tools that may not be written by your team could potential benefit from the k8s standard.</p>
+
+<h3 id="and-more">And More&hellip;</h3>
+
+<p>There are probably more little things that are more than bike-shedding momemnts. I&rsquo;ll come up with a followup post.</p>
+]]></content>
+		</item>
+		
+	</channel>
+</rss>

@@ -3,11 +3,18 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://ghostsquad.github.io/categories/</loc>
+    <loc>https://ghostsquad.github.io/</loc>
+    <lastmod>2019-08-23T18:44:31-07:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ghostsquad.github.io/</loc>
+    <loc>https://ghostsquad.github.io/posts/</loc>
+    <lastmod>2019-08-23T18:44:31-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ghostsquad.github.io/posts/the-little-things/</loc>
+    <lastmod>2019-08-23T18:44:31-07:00</lastmod>
   </url>
   
   <url>

@@ -5,10 +5,23 @@
     <link>https://ghostsquad.github.io/</link>
     <description>Recent content on ghostsquad blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 23 Aug 2019 18:44:31 -0700</lastBuildDate>
     
 	<atom:link href="https://ghostsquad.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The Little Things</title>
+      <link>https://ghostsquad.github.io/posts/the-little-things/</link>
+      <pubDate>Fri, 23 Aug 2019 18:44:31 -0700</pubDate>
+      
+      <guid>https://ghostsquad.github.io/posts/the-little-things/</guid>
+      <description>One thing I&amp;rsquo;ve noticed over the years is that the little things in software development often get overlooked as &amp;ldquo;bike shedding&amp;rdquo; moments, and yet there&amp;rsquo;s significant value in establishing a standard, convention, and even automation around these overlooked things. Let&amp;rsquo;s dive right in:
+Git Commits Following conventional commits standards can allow you to do things like:
+ Automatically generate CHANGELOGs Automatically determine semantic version bump Communicate nature of changes to teammates, public, stakeholders Used to change build pipeline behavior at runtime to publish code automatically Enhance readability of git commit history  I&amp;rsquo;m in the SRE/DevOps/PaaS space, and I often find myself wishing I had more time to write weekly newsletters or similar communications to internal teams to increase the visibility of the new features, bugfixes, and other changes that are being delivered.</description>
+    </item>
     
   </channel>
 </rss>
