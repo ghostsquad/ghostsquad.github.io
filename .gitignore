@@ -1,0 +1,5 @@
+# Jetbrains IDEs
+.idea
+
+# Hugo generated content
+/public
