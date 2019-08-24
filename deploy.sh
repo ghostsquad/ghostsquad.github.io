@@ -1,25 +1,35 @@
-#!/usr/bin/env bash
 
-# If a command fails then the deploy stops
-set -e
+#!/bin/sh
 
-printf "\033[0;32mDeploying updates to GitHub...\033[0m\n"
+if [ "`git status -s`" ]
+then
+    echo "The working directory is dirty. Please commit any pending changes."
+    exit 1;
+fi
 
-# Build the project.
-hugo # if using a theme, replace with `hugo -t <YOURTHEME>`
+echo "Deleting old publication"
+rm -rf public
+mkdir public
+git worktree prune
+rm -rf .git/worktrees/public/
 
-# Go To Public folder
-cd public
+echo "Checking out gh-pages branch into public"
+git worktree add -B master public origin/master
 
-# Add changes to git.
-git add .
+echo "Removing existing files"
+rm -rf public/*
 
-# Commit changes.
+echo "Generating site"
+hugo
+
 msg="rebuilding site $(date)"
 if [ -n "$*" ]; then
 	msg="$*"
 fi
 git commit -m "$msg"
 
-# Push source and build repos.
-git push origin master
+echo "Updating gh-pages branch"
+cd public && git add --all && git commit -m "$msg"
+
+#echo "Pushing to github"
+#git push --all
