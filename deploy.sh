@@ -1,35 +1,51 @@
+#!/usr/bin/env bash
 
-#!/bin/sh
+set -e
 
-if [ "`git status -s`" ]
-then
-    echo "The working directory is dirty. Please commit any pending changes."
-    exit 1;
-fi
+repo_dir="$( cd "$( dirname "$0" )" && pwd )"
 
-echo "Deleting old publication"
-rm -rf public
-mkdir public
-git worktree prune
-rm -rf .git/worktrees/public/
+(
+    cd "$repo_dir"
 
-echo "Checking out gh-pages branch into public"
-git worktree add -B master public origin/master
+    branch_name="$(git symbolic-ref HEAD 2>/dev/null)" ||
+    branch_name="(unnamed branch)"     # detached HEAD
 
-echo "Removing existing files"
-rm -rf public/*
+    branch_name=${branch_name##refs/heads/}
 
-echo "Generating site"
-hugo
+    if [ "${branch_name}" != "hugo" ]; then
+        echo "Can only publish from the main \"hugo\" branch"
+        exit 1
+    fi
 
-msg="rebuilding site $(date)"
-if [ -n "$*" ]; then
-	msg="$*"
-fi
-git commit -m "$msg"
+    if [ "$(git status -s)" ]; then
+        echo "The working directory is dirty. Please commit any pending changes."
+        exit 1;
+    fi
 
-echo "Updating gh-pages branch"
-cd public && git add --all && git commit -m "$msg"
+    echo "Deleting old publication"
+    rm -rf public
+    mkdir public
+    git worktree prune
+    rm -rf .git/worktrees/public/
 
-#echo "Pushing to github"
-#git push --all
+    echo "Checking out gh-pages branch into public"
+    git worktree add -B master public origin/master
+
+    echo "Removing existing files"
+    rm -rf public/*
+
+    echo "Generating site"
+    hugo
+
+    msg="rebuilding site $(date)"
+    if [ -n "$*" ]; then
+        msg="$*"
+    fi
+    git commit -m "$msg"
+
+    echo "Updating gh-pages branch"
+    cd public && git add --all && git commit -m "$msg"
+
+    echo "Pushing to github"
+    git push --all
+)
