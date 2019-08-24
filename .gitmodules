@@ -1,7 +1,3 @@
 [submodule "themes/edidor"]
 	path = themes/edidor
 	url = https://github.com/jacobsun/edidor
-[submodule "public"]
-	path = public
-	url = git@github.com:ghostsquad/ghostsquad.github.io.git
-	branch = master
