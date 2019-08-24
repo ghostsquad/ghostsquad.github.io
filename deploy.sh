@@ -28,7 +28,7 @@ repo_dir="$( cd "$( dirname "$0" )" && pwd )"
     git worktree prune
     rm -rf .git/worktrees/public/
 
-    echo "Checking out gh-pages branch into public"
+    echo "Checking out master branch into public"
     git worktree add -B master public origin/master
 
     echo "Removing existing files"
@@ -43,7 +43,7 @@ repo_dir="$( cd "$( dirname "$0" )" && pwd )"
     fi
     git commit -m "$msg"
 
-    echo "Updating gh-pages branch"
+    echo "Updating master branch"
     cd public && git add --all && git commit -m "$msg"
 
     echo "Pushing to github"
