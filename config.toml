@@ -1,6 +1,6 @@
 theme = "edidor"
 title = "ghostsquad blog"
-baseurl = "https://ghostsquad.github.io/me"
+baseurl = "https://ghostsquad.github.io"
 AuthorName = "Wes McNamee"
 # place your logo file to ./static/images to set logo
 
@@ -16,7 +16,7 @@ paginate = 5
 enableEmoji = true
 
 # to have better preview
-buildDrafts = "true"
+# buildDrafts = "true"
 # helpful if you want to edit the site or theme code
 disableFastRender = true
 # --------------------------------------------------------------------------
@@ -26,11 +26,11 @@ googleAnalytics = "your ga id"
 
 # social link in the footer, change it to "" hide it
 [social]
-    github = " "
-    facebook = " "
-    twitter = " "
-    behance = " "
-    email = " "
+    github = "github.com/ghostsquad"
+    facebook = ""
+    twitter = "@westonmcnamee"
+    behance = ""
+    email = ""
 
 # author, title, description are used in the home page, you can embed html tag in description
 [params]
