@@ -44,7 +44,12 @@ repo_dir="$( cd "$( dirname "$0" )" && pwd )"
     git commit -m "$msg"
 
     echo "Updating master branch"
-    cd public && git add --all && git commit -m "$msg"
+    (
+        cd public
+        git add --all
+        git commit -m "$msg"
+
+    )
 
     echo "Pushing to github"
     git push --all
