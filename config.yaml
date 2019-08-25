@@ -11,7 +11,7 @@ copyright: >-
   International License.
 enableEmoji: true
 author:
-  name: John Doe
+  name: Wes McNamee
 blackfriday: {}
 taxonomies:
   tag: tags
@@ -21,18 +21,16 @@ params:
   dateformNum: "2006-01-02"
   dateformNumTime: "2006-01-02 15:04 -0700"
   themeColor: "#494f5c"
-  homeSubtitle: A minimal and fast theme for Hugo.
+  homeSubtitle: according to the dev...
   footerCopyright: ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
   justifyContent: false
   relatedPosts: false
   code_copy_button: true
   social:
     - name: twitter
-      url: "https://twitter.com/"
-    - name: instagram
-      url: "https://instagram.com/"
+      url: "https://twitter.com/WestonMcNamee"
     - name: github
-      url: "https://github.com/"
+      url: "https://github.com/ghostsquad"
 menu:
   main:
     - name: Posts
