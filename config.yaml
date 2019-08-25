@@ -3,6 +3,7 @@ languageCode: en-us
 defaultContentLanguage: en
 title: ghostsquad blog
 theme: hermit
+googleAnalytics: UA-146422848-1
 pygmentsCodefences: true
 pygmentsUseClasses: true
 rssLimit: 10
