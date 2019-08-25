@@ -68,7 +68,7 @@ Git Commits Following conventional commits standards can allow you to do things 
 </span><span class="w"></span>custom.company.io/something-not-standard<span class="p">:</span><span class="w"> </span>this-is-project-or-team-specific</code></pre></div>
 <p><a href="https://dev.to/jeroendedauw/the-fallacy-of-dry">Dry is an anti-pattern</a>. Some of these are duplicates of <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/">recommended annotations/labels for kubernetes</a>. Don&rsquo;t worry about duplication. Use them both, because you&rsquo;ll apply the ones above to more things than just K8s resources. Tools that may not be written by your team could potential benefit from the k8s standard.</p>
 
-<h3 id="and-more">And More&hellip;</h3>
+<hr />
 
 <p>There are probably more little things that are more than bike-shedding momemnts. I&rsquo;ll come up with a followup post.</p>
 ]]></content>
