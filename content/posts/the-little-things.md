@@ -47,7 +47,7 @@ company.io/part-of: wordpress
 custom.company.io/something-not-standard: this-is-project-or-team-specific
 ```
 
-[Dry is an anti-pattern](https://dev.to/jeroendedauw/the-fallacy-of-dry). Some of these are duplicates of [recommended annotations/labels for kubernetes](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/). Don't worry about duplication. Use them both, because you'll apply the ones above to more things than just K8s resources. Tools that may not be written by your team could potential benefit from the k8s standard.
+Some of these are duplicates of [recommended annotations/labels for kubernetes](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/). [Don't worry about duplication](https://dev.to/jeroendedauw/the-fallacy-of-dry). Use them both, because you'll apply the ones above to more things than just K8s resources. Tools that may not be written by your team could potential benefit from the k8s standard.
 
 ---
 
