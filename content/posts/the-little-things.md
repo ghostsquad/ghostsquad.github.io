@@ -51,4 +51,4 @@ custom.company.io/something-not-standard: this-is-project-or-team-specific
 
 ---
 
-There are probably more little things that are more than bike-shedding momemnts. I'll come up with a followup post.
+This will certainly be a multi-part series. Stay tuned for more!
