@@ -4,6 +4,7 @@ defaultContentLanguage: en
 title: ghostsquad blog
 theme: hermit
 googleAnalytics: UA-146422848-1
+enableGitInfo: true
 pygmentsCodefences: true
 pygmentsUseClasses: true
 rssLimit: 10
@@ -38,5 +39,5 @@ menu:
       url: posts/
       weight: 10
     - name: About
-      url: about-hugo/
+      url: about/
       weight: 20

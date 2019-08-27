@@ -14,6 +14,9 @@
 </style>
 {{- end -}}
 {{- end -}}
+<script defer src="/fontawesome/brands.min.js"></script>
+<script defer src="/fontawesome/regular.min.js"></script>
+<script defer src="/fontawesome/fontawesome.min.js"></script>
 {{ end }}
 
 {{ define "header" }}
@@ -27,9 +30,15 @@
 <main class="site-main section-inner animated fadeIn faster">
 	<article class="thin">
 		<header class="post-header">
-			<div class="post-meta"><span>{{ .Date.Format .Site.Params.dateform }}</span></div>
 			<h1>{{ .Title }}</h1>
-			<p>{{ .ReadingTime }} min read</p>
+			<div class="post-meta"><span>
+					<span><span class="far fa-clock"></span>&nbsp;{{ .Date.Format .Site.Params.dateform }}</span>
+					<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+					<span><span
+							class="far fa-edit"></span>&nbsp;{{ .Page.Lastmod.Format .Site.Params.dateform }}</span></span>
+				<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+				<span><span class="far fa-hourglass"></span>&nbsp;{{ .ReadingTime }} min</span>
+			</div>
 		</header>
 		<div class="content">
 			{{ .Content | replaceRE "(<h[1-6] id=\"([^\"]+)\".+)(</h[1-6]+>)" `${1}<a href="#${2}" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a>${3}` | safeHTML }}
