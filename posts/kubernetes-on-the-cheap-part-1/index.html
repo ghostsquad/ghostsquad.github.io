@@ -1,29 +1,100 @@
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-	<channel>
-		<title>Posts on ghostsquad blog</title>
-		<link>https://ghostsquad.me/posts/</link>
-		<description>Recent content in Posts on ghostsquad blog</description>
-		<generator>Hugo -- gohugo.io</generator>
-		<language>en-us</language>
-		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Sat, 16 Nov 2019 17:49:17 -0800</lastBuildDate>
-		<atom:link href="https://ghostsquad.me/posts/index.xml" rel="self" type="application/rss+xml" />
-		
-		<item>
-			<title>Kubernetes on the Cheap - Part 1</title>
-			<link>https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/</link>
-			<pubDate>Sat, 16 Nov 2019 17:49:17 -0800</pubDate>
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+<meta itemprop="name" content="Kubernetes on the Cheap - Part 1">
+<meta itemprop="description" content="How to run Kubernetes for less than $6 per month?
+I wanted to play around with Kubernetes for personal learning, and even some personal projects. I wanted to deploy a website with a live backend, but I didn&rsquo;t really want to be bound to cPanel, or terrible performance issues on shared hosting providers. This was also an opportunity for me to learn more about deploying an application end2end and managing it myself.">
+
+
+<meta itemprop="datePublished" content="2019-11-16T17:49:17-08:00" />
+<meta itemprop="dateModified" content="2019-11-19T14:06:15-08:00" />
+<meta itemprop="wordCount" content="2254">
+
+
+
+<meta itemprop="keywords" content="untagged," />
+<meta property="og:title" content="Kubernetes on the Cheap - Part 1" />
+<meta property="og:description" content="How to run Kubernetes for less than $6 per month?
+I wanted to play around with Kubernetes for personal learning, and even some personal projects. I wanted to deploy a website with a live backend, but I didn&rsquo;t really want to be bound to cPanel, or terrible performance issues on shared hosting providers. This was also an opportunity for me to learn more about deploying an application end2end and managing it myself." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/" />
+<meta property="article:published_time" content="2019-11-16T17:49:17-08:00" />
+<meta property="article:modified_time" content="2019-11-19T14:06:15-08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kubernetes on the Cheap - Part 1"/>
+<meta name="twitter:description" content="How to run Kubernetes for less than $6 per month?
+I wanted to play around with Kubernetes for personal learning, and even some personal projects. I wanted to deploy a website with a live backend, but I didn&rsquo;t really want to be bound to cPanel, or terrible performance issues on shared hosting providers. This was also an opportunity for me to learn more about deploying an application end2end and managing it myself."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Kubernetes on the Cheap - Part 1</title>
+	<link rel="stylesheet" href="https://ghostsquad.me/css/style.min.5ee5e7976cd09872c64e40a582206543f6aa38c69a8c43898aadc70040344b92.css" integrity="sha256-XuXnl2zQmHLGTkClgiBlQ/aqOMaajEOJiq3HAEA0S5I=" crossorigin="anonymous">
+<script defer src="/fontawesome/brands.min.js"></script>
+<script defer src="/fontawesome/regular.min.js"></script>
+<script defer src="/fontawesome/fontawesome.min.js"></script>
+
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="https://ghostsquad.me">ghostsquad blog</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					
+				<a href="https://ghostsquad.me/posts/">Posts</a>
+				<a href="https://ghostsquad.me/about/">About</a>
+
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://twitter.com/WestonMcNamee" target="_blank" rel="noopener me" title="Twitter"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg></a><a href="https://github.com/ghostsquad" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="https://ghostsquad.me/posts/">Posts</a></li>
+			<li><a href="https://ghostsquad.me/about/">About</a></li>
+		</ul>
+	</div>
+
+
+<main class="site-main section-inner animated fadeIn faster">
+	<article class="thin">
+		<header class="post-header">
+			<h1>Kubernetes on the Cheap - Part 1</h1>
+			<div class="post-meta"><span>
+					<span><span class="far fa-clock"></span>&nbsp;Nov 16, 2019</span>
+					<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+					<span><span
+							class="far fa-edit"></span>&nbsp;Nov 19, 2019</span></span>
+				<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+				<span><span class="far fa-hourglass"></span>&nbsp;11 min</span>
+			</div>
+		</header>
+		<div class="content">
 			
-			<guid>https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/</guid>
-			<description>How to run Kubernetes for less than $6 per month?
-I wanted to play around with Kubernetes for personal learning, and even some personal projects. I wanted to deploy a website with a live backend, but I didn&amp;rsquo;t really want to be bound to cPanel, or terrible performance issues on shared hosting providers. This was also an opportunity for me to learn more about deploying an application end2end and managing it myself.</description>
-			<content type="html"><![CDATA[
 
 <p>How to run Kubernetes for less than $6 per month?</p>
 
 <p>I wanted to play around with Kubernetes for personal learning, and even some personal projects. I wanted to deploy a website with a live backend, but I didn&rsquo;t really want to be bound to cPanel, or terrible performance issues on shared hosting providers. This was also an opportunity for me to learn more about deploying an application end2end and managing it myself. This post details the exact steps to deploy a Kubernetes cluster to Google Cloud Platform, and run a single, low-utilization application for about $5/mo. It includes all the pitfalls, gotchas, shortcuts, workarounds, optimizations, etc in order to make it work, step by step.</p>
 
-<h2 id="table-of-contents">Table of Contents</h2>
+<h2 id="table-of-contents">Table of Contents<a href="#table-of-contents" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <ul>
 <li><a href="#table-of-contents">Table of Contents</a></li>
@@ -48,7 +119,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <li><a href="#conclusion">Conclusion</a></li>
 </ul>
 
-<h2 id="create-a-gcp-account-project">Create a GCP Account &amp; Project</h2>
+<h2 id="create-a-gcp-account-project">Create a GCP Account &amp; Project<a href="#create-a-gcp-account-project" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <ol>
 <li>You can create or select a GCP Project from the <a href="https://console.cloud.google.com/projectselector2/home/dashboard">Project Selector Page</a>.</li>
@@ -63,7 +134,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">alias</span> <span class="nv">k</span><span class="o">=</span>kubectl</code></pre></div>
 <p>or</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&#34;alias k=kubectl&#34;</span> &gt;&gt; <span class="nv">$HOME</span>/.bashrc</code></pre></div>
-<h2 id="create-a-gke-cluster">Create a GKE Cluster</h2>
+<h2 id="create-a-gke-cluster">Create a GKE Cluster<a href="#create-a-gke-cluster" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>GKE (Google Kubernetes Engine) is actually FREE on GCP&hellip; well the master nodes are. You can create a cluster without any worker nodes at no cost. That&rsquo;s the next step. First, navigate to <a href="https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap">https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap</a> but replacing the <code>project</code> with your own project name. Google has to enable the <code>Kubernetes Engine API</code>, and it takes a few minutes.</p>
 
@@ -134,13 +205,13 @@ gcloud beta container <span class="se">\
 
 <p>This command will immediately create a cluster and a node pool with 3 nodes in it. That&rsquo;s a bit too much for my liking, so let&rsquo;s delete the default node pool, and recreate it so that there&rsquo;s only 1 node in it.</p>
 
-<h3 id="zones-regions-and-other-network-to-consider">Zones, Regions, and other network to consider</h3>
+<h3 id="zones-regions-and-other-network-to-consider">Zones, Regions, and other network to consider<a href="#zones-regions-and-other-network-to-consider" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 
-<h3 id="pre-emptible-instances">Pre-emptible Instances</h3>
+<h3 id="pre-emptible-instances">Pre-emptible Instances<a href="#pre-emptible-instances" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 
-<h3 id="updating-cluster-authorized-networks">Updating Cluster Authorized Networks</h3>
+<h3 id="updating-cluster-authorized-networks">Updating Cluster Authorized Networks<a href="#updating-cluster-authorized-networks" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 
-<h2 id="optimizations">Optimizations</h2>
+<h2 id="optimizations">Optimizations<a href="#optimizations" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>When the cluster comes up, you&rsquo;ll already have quite a few deployed pods on the cluster. If this was a large cluster, the defaults would probably be fine. But we are on a budget! So we need to modify some of these.</p>
 
@@ -163,17 +234,17 @@ prometheus-to-sd-z2kw7                                      1m           11Mi
 stackdriver-metadata-agent-cluster-level-684c9bb574-vkjhw   4m           17Mi</code></pre></div>
 <p>We&rsquo;ll be able to recover some of this (detailed below). But the rest is outside of our control, since these are GKE addons. Any modification to them simply gets reverted.</p>
 
-<h3 id="fluentd-gcp-scaler">fluentd-gcp-scaler</h3>
+<h3 id="fluentd-gcp-scaler">fluentd-gcp-scaler<a href="#fluentd-gcp-scaler" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 
 <p>This is part of the StackDriver addon.</p>
 
 <p>I believe this is similar to a <code>VerticalPodAutoscaler</code>, which I don&rsquo;t need, so here&rsquo;s how to disable it. Thankfully this is one of the deployments that doesn&rsquo;t mind being scaled to 0.</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">k -n kube-system scale deployment fluentd-gcp-scaler --replicas<span class="o">=</span><span class="m">0</span></code></pre></div>
-<h3 id="kube-dns-autoscaler">kube-dns-autoscaler</h3>
+<h3 id="kube-dns-autoscaler">kube-dns-autoscaler<a href="#kube-dns-autoscaler" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
 
 <p>I don&rsquo;t need kube-dns to scale, so here&rsquo;s how to disable this.</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">k -n kube-system scale deployment kube-dns-autoscaler --replicas<span class="o">=</span><span class="m">0</span></code></pre></div>
-<h2 id="resource-utilization-overview">Resource Utilization Overview</h2>
+<h2 id="resource-utilization-overview">Resource Utilization Overview<a href="#resource-utilization-overview" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <table>
 <thead>
@@ -207,7 +278,7 @@ stackdriver-metadata-agent-cluster-level-684c9bb574-vkjhw   4m           17Mi</c
 
 <p>Much of this is coming from StackDriver addon pods. Maybe in another post, I&rsquo;ll look into an alternative solution, but for now, the remainder is more than enough for a small backend webserver.</p>
 
-<h2 id="deploy-nginx-ingress">Deploy Nginx Ingress</h2>
+<h2 id="deploy-nginx-ingress">Deploy Nginx Ingress<a href="#deploy-nginx-ingress" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>Loadbalancers in GCP have a minimum of $0.60/day or $18/mo charge, so to avoid creating one, we need to setup nginx ingress in a special way.</p>
 
@@ -507,7 +578,7 @@ stackdriver-metadata-agent-cluster-level-684c9bb574-vkjhw   4m           17Mi</c
 </span><span class="s">EOF</span>
 
 kubectl apply -f nginx.yaml</code></pre></div>
-<h2 id="create-a-firewall-rule-to-allow-traffic-to-the-nodes">Create a firewall rule to allow traffic to the nodes</h2>
+<h2 id="create-a-firewall-rule-to-allow-traffic-to-the-nodes">Create a firewall rule to allow traffic to the nodes<a href="#create-a-firewall-rule-to-allow-traffic-to-the-nodes" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TARGET_TAG</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].tags.items[0]&#39;</span><span class="k">)</span>
 
 gcloud compute <span class="se">\
@@ -520,7 +591,7 @@ gcloud compute <span class="se">\
 </span><span class="se"></span>  --rules<span class="o">=</span>tcp:80,tcp:443 <span class="se">\
 </span><span class="se"></span>  --source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0 <span class="se">\
 </span><span class="se"></span>  --target-tags<span class="o">=</span><span class="nv">$TARGET_TAG</span></code></pre></div>
-<h2 id="deploy-a-simple-app">Deploy a simple app</h2>
+<h2 id="deploy-a-simple-app">Deploy a simple app<a href="#deploy-a-simple-app" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">EXT_IP</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].networkInterfaces[0].accessConfigs[0].natIP&#39;</span><span class="k">)</span>
 <span class="nb">echo</span> <span class="nv">$EXT_IP</span>
 <span class="nv">HOST</span><span class="o">=</span><span class="s2">&#34;test.</span><span class="si">${</span><span class="nv">EXT_IP</span><span class="si">}</span><span class="s2">.xip.io&#34;</span>
@@ -586,7 +657,7 @@ kubectl create -f hello.yaml
 
 <p>We&rsquo;ll address this in the next part of this series!</p>
 
-<h2 id="conclusion">Conclusion</h2>
+<h2 id="conclusion">Conclusion<a href="#conclusion" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>We&rsquo;ve deployed a cluster to GKE running a single node. We deployed nginx ingress to run on the host network to avoid creating a load balancer, and we deployed a simple test application.</p>
 
@@ -598,73 +669,75 @@ kubectl create -f hello.yaml
 <li>Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</li>
 <li>Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</li>
 </ul>
-]]></content>
-		</item>
-		
-		<item>
-			<title>The Little Things</title>
-			<link>https://ghostsquad.me/posts/the-little-things/</link>
-			<pubDate>Fri, 23 Aug 2019 18:44:31 -0700</pubDate>
-			
-			<guid>https://ghostsquad.me/posts/the-little-things/</guid>
-			<description>One thing I&amp;rsquo;ve noticed over the years is that the little things in software development often get overlooked as &amp;ldquo;bike shedding&amp;rdquo; moments, and yet there&amp;rsquo;s significant value in establishing a standard, convention, and even automation around these overlooked things. Let&amp;rsquo;s dive right in:
-Git Commits Following conventional commits standards can allow you to do things like:
- Automatically generate CHANGELOGs Automatically determine semantic version bump Communicate nature of changes to teammates, public, stakeholders Used to change build pipeline behavior at runtime to publish code automatically Enhance readability of git commit history  I&amp;rsquo;m in the SRE/DevOps/PaaS space, and I often find myself wishing I had more time to write weekly newsletters or similar communications to internal teams to increase the visibility of the new features, bugfixes, and other changes that are being delivered.</description>
-			<content type="html"><![CDATA[
 
-<p>One thing I&rsquo;ve noticed over the years is that the little things in software development often get overlooked as &ldquo;bike shedding&rdquo; moments, and yet there&rsquo;s significant value in establishing a standard, convention, and even automation around these overlooked things. Let&rsquo;s dive right in:</p>
+		</div>
+		<hr class="post-end">
+		<footer class="post-info">
+			<p>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+					class="feather feather-tag meta-icon">
+					<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+					<line x1="7" y1="7" x2="7" y2="7"></line>
+				</svg><span class="tag"><a href="https://ghostsquad.me/tags/untagged">untagged</a></span>
+			</p>
+			<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+					class="feather feather-file-text">
+					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+					<polyline points="14 2 14 8 20 8"></polyline>
+					<line x1="16" y1="13" x2="8" y2="13"></line>
+					<line x1="16" y1="17" x2="8" y2="17"></line>
+					<polyline points="10 9 9 9 8 9"></polyline>
+				</svg>2254 Words</p>
+			<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+					class="feather feather-calendar">
+					<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+					<line x1="16" y1="2" x2="16" y2="6"></line>
+					<line x1="8" y1="2" x2="8" y2="6"></line>
+					<line x1="3" y1="10" x2="21" y2="10"></line>
+				</svg>2019-11-16 17:49 -0800</p>
+		</footer>
+	</article>
+	<div class="post-nav thin">
+		<a class="prev-post" href="https://ghostsquad.me/posts/the-little-things/">
+			<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24"
+					height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+					stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right">
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+					<polyline points="12 5 19 12 12 19"></polyline>
+				</svg></span><br><span>The Little Things</span>
+		</a>
+	</div>
+	<div id="comments" class="thin"><script src="https://utteranc.es/client.js" repo="ghostsquad/ghostsquad.github.io" issue-term="pathname"
+    label="blog-comment" theme="github-dark-orange" crossorigin="anonymous" async>
+    </script></div>
+</main>
 
-<h3 id="git-commits">Git Commits</h3>
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 <a href="https://ghostsquad.me">Wes McNamee</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="https://ghostsquad.me/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
 
-<p>Following <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/">conventional commits</a> standards can allow you to do things like:</p>
 
-<ol>
-<li>Automatically generate CHANGELOGs</li>
-<li>Automatically determine semantic version bump</li>
-<li>Communicate nature of changes to teammates, public, stakeholders</li>
-<li>Used to change build pipeline behavior at runtime to publish code automatically</li>
-<li>Enhance readability of git commit history</li>
-</ol>
 
-<p>I&rsquo;m in the SRE/DevOps/PaaS space, and I often find myself wishing I had more time to write weekly newsletters  or similar communications to internal teams to increase the visibility of the new features, bugfixes, and other changes that are being delivered. This includes beta releases, and getting volunteers to provide feedback on tools/services before distributing them to the wider engineering organization. With this said, I cannot overstate the value of #1 and #3 in the above list. I don&rsquo;t mean a <a href="https://about.gitlab.com/releases/">hard-to-read, never-ending list</a> either. Imagine being able to <em>generate</em> a releases page like <a href="https://about.gitlab.com/2019/08/22/gitlab-12-2-released/index.html">Gitlab&rsquo;s 12.2 release</a>. This is theoretically possible through a combination of well-written commits (that are machine parseable) and well-written epics, that can be queried.</p>
+	<script src="https://ghostsquad.me/js/bundle.min.4a9a0ac3d2217822c7865b4161e6c2a71de1d70492264337755427898dd718f6.js" integrity="sha256-SpoKw9IheCLHhltBYebCpx3h1wSSJkM3dVQniY3XGPY=" crossorigin="anonymous"></script>
+	
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-146422848-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
-<p>Combine this with <a href="https://chris.beams.io/posts/git-commit/#seven-rules">Chris Beams&rsquo;: How to Write a Git Commit Message</a> and it makes it trivial to go back in time an figure out why something was done.</p>
 
-<h3 id="project-structure-naming">Project Structure &amp; Naming</h3>
+</body>
 
-<p>Conventions over Configuration. This applies to a project directory structure &amp; naming too. Here&rsquo;s some benefits of coming up with and sticking to a polyglot convention, similar to <a href="https://github.com/golang-standards/project-layout">Go project structure recommendations</a>.</p>
-
-<ol>
-<li>CI/CD templated/generated pipelines
-
-<ul>
-<li>If your project name is valid DNS (and all lowercase), it makes it easy to use (without modification) as your kubernetes namespace (or namespace prefix).</li>
-<li><code>Dockerfile</code> in the root of your repo? We have a pre-baked step to build/publish without any additional configuration.</li>
-<li>Using <code>make</code>? A standard pipeline can make some assumptions for you about commands to run without requiring explicit configuration.</li>
-</ul></li>
-<li>Enhance readability &amp; maintenance by teammates and external teams. Sticking to a convention means that someone doesn&rsquo;t need to learn &ldquo;how <em>your</em> repo does it&rdquo;.</li>
-<li>New projects can be <a href="https://github.com/facebook/create-react-app">templatized/generated</a>. If you have the pleasure of being able to spinup &amp; deploy greenfield applications on a regular basis, this becomes an automatable step.</li>
-</ol>
-
-<h3 id="tags-labels-annotations">Tags, Labels, Annotations</h3>
-
-<p>Again, this is all about automation. It makes sense to have a standard set of keys and a convention for custom keys that are forward compatible with changes to the standard. Use this same standard for your cloud provider, like AWS, as well as Kubernetes resources.</p>
-<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">company.io/environment<span class="p">:</span><span class="w"> </span>prd<span class="w">
-</span><span class="w"></span>company.io/team<span class="p">:</span><span class="w"> </span>sig-api<span class="w">
-</span><span class="w"></span>company.io/contact<span class="p">:</span><span class="w"> </span>sig-api@company.io<span class="w">
-</span><span class="w"></span>company.io/managed-by<span class="p">:</span><span class="w"> </span>terraform<span class="w">
-</span><span class="w"></span>company.io/fingerprint<span class="p">:</span><span class="w"> </span>abc123<span class="w">
-</span><span class="w"></span>company.io/fingerprint-type<span class="p">:</span><span class="w"> </span>sha1<span class="w">
-</span><span class="w"></span>company.io/component<span class="p">:</span><span class="w"> </span>database<span class="w">
-</span><span class="w"></span>company.io/part-of<span class="p">:</span><span class="w"> </span>wordpress<span class="w">
-</span><span class="w"></span>custom.company.io/something-not-standard<span class="p">:</span><span class="w"> </span>this-is-project-or-team-specific</code></pre></div>
-<p>Some of these are duplicates of <a href="https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/">recommended annotations/labels for kubernetes</a>. <a href="https://dev.to/jeroendedauw/the-fallacy-of-dry">Don&rsquo;t worry about duplication</a>. Use them both, because you&rsquo;ll apply the ones above to more things than just K8s resources. Tools that may not be written by your team could potential benefit from the k8s standard.</p>
-
-<hr />
-
-<p>This will certainly be a multi-part series. Stay tuned for more!</p>
-]]></content>
-		</item>
-		
-	</channel>
-</rss>
+</html>
