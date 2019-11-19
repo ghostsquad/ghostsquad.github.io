@@ -17,9 +17,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 - [Table of Contents](#table-of-contents)
 - [Create a GCP Account & Project](#create-a-gcp-account--project)
 - [Create a GKE Cluster](#create-a-gke-cluster)
-  - [Zones, Regions, and other network to consider](#zones-regions-and-other-network-to-consider)
   - [Pre-emptible Instances](#pre-emptible-instances)
-  - [Updating Cluster Authorized Networks](#updating-cluster-authorized-networks)
 - [Optimizations](#optimizations)
   - [fluentd-gcp-scaler](#fluentd-gcp-scaler)
   - [kube-dns-autoscaler](#kube-dns-autoscaler)
@@ -58,12 +56,14 @@ Here's the command to run, but you'll have to fill in a few things yourself. The
 
 Most of the next commands can be run from the google cloud console via their website.
 
-You'll need to run this locally (you can copy/paste the output though in the GCloud Console)
+Run this locally, and copy the output (or visit the website below to get your home IP address)
 
 ```bash
 MY_HOME_IP="$(curl https://ifconfig.co/ip)"
 echo "MY_HOME_IP=${MY_HOME_IP}"
 ```
+
+Run this from the Cloud Shell console
 
 ```bash
 PROJECT_NAME="kubernetes-on-the-cheap"
@@ -127,11 +127,11 @@ gcloud beta container \
 
 This command will immediately create a cluster and a node pool with 3 nodes in it. That's a bit too much for my liking, so let's delete the default node pool, and recreate it so that there's only 1 node in it.
 
-### Zones, Regions, and other network to consider
-
 ### Pre-emptible Instances
 
-### Updating Cluster Authorized Networks
+You can read more about preemptible instances from the offical docs:
+
+[https://cloud.google.com/compute/docs/instances/preemptible](https://cloud.google.com/compute/docs/instances/preemptible)
 
 ## Optimizations
 
