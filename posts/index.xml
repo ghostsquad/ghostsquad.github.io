@@ -31,9 +31,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <li><a href="#create-a-gke-cluster">Create a GKE Cluster</a>
 
 <ul>
-<li><a href="#zones-regions-and-other-network-to-consider">Zones, Regions, and other network to consider</a></li>
 <li><a href="#pre-emptible-instances">Pre-emptible Instances</a></li>
-<li><a href="#updating-cluster-authorized-networks">Updating Cluster Authorized Networks</a></li>
 </ul></li>
 <li><a href="#optimizations">Optimizations</a>
 
@@ -71,9 +69,11 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 
 <p>Most of the next commands can be run from the google cloud console via their website.</p>
 
-<p>You&rsquo;ll need to run this locally (you can copy/paste the output though in the GCloud Console)</p>
+<p>Run this locally, and copy the output (or visit the website below to get your home IP address)</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">MY_HOME_IP</span><span class="o">=</span><span class="s2">&#34;</span><span class="k">$(</span>curl https://ifconfig.co/ip<span class="k">)</span><span class="s2">&#34;</span>
-<span class="nb">echo</span> <span class="s2">&#34;MY_HOME_IP=</span><span class="si">${</span><span class="nv">MY_HOME_IP</span><span class="si">}</span><span class="s2">&#34;</span></code></pre></div><div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
+<span class="nb">echo</span> <span class="s2">&#34;MY_HOME_IP=</span><span class="si">${</span><span class="nv">MY_HOME_IP</span><span class="si">}</span><span class="s2">&#34;</span></code></pre></div>
+<p>Run this from the Cloud Shell console</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
 <span class="nv">REGION</span><span class="o">=</span><span class="s2">&#34;us-west1&#34;</span>
 <span class="nv">ZONE_ID</span><span class="o">=</span><span class="s2">&#34;a&#34;</span>
 <span class="nv">ZONE</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">ZONE_ID</span><span class="si">}</span><span class="s2">&#34;</span>
@@ -134,11 +134,11 @@ gcloud beta container <span class="se">\
 
 <p>This command will immediately create a cluster and a node pool with 3 nodes in it. That&rsquo;s a bit too much for my liking, so let&rsquo;s delete the default node pool, and recreate it so that there&rsquo;s only 1 node in it.</p>
 
-<h3 id="zones-regions-and-other-network-to-consider">Zones, Regions, and other network to consider</h3>
-
 <h3 id="pre-emptible-instances">Pre-emptible Instances</h3>
 
-<h3 id="updating-cluster-authorized-networks">Updating Cluster Authorized Networks</h3>
+<p>You can read more about preemptible instances from the offical docs:</p>
+
+<p><a href="https://cloud.google.com/compute/docs/instances/preemptible">https://cloud.google.com/compute/docs/instances/preemptible</a></p>
 
 <h2 id="optimizations">Optimizations</h2>
 
