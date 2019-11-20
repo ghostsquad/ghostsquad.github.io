@@ -13,8 +13,8 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 
 
 <meta itemprop="datePublished" content="2019-11-16T17:49:17-08:00" />
-<meta itemprop="dateModified" content="2019-11-19T15:09:31-08:00" />
-<meta itemprop="wordCount" content="1699">
+<meta itemprop="dateModified" content="2019-11-19T20:18:34-08:00" />
+<meta itemprop="wordCount" content="1186">
 
 
 
@@ -25,7 +25,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/" />
 <meta property="article:published_time" content="2019-11-16T17:49:17-08:00" />
-<meta property="article:modified_time" content="2019-11-19T15:09:31-08:00" />
+<meta property="article:modified_time" content="2019-11-19T20:18:34-08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kubernetes on the Cheap - Part 1"/>
 <meta name="twitter:description" content="How to run Kubernetes for less than $6 per month?
@@ -84,7 +84,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 					<span><span
 							class="far fa-edit"></span>&nbsp;Nov 19, 2019</span></span>
 				<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-				<span><span class="far fa-hourglass"></span>&nbsp;8 min</span>
+				<span><span class="far fa-hourglass"></span>&nbsp;6 min</span>
 			</div>
 		</header>
 		<div class="content">
@@ -99,17 +99,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <ul>
 <li><a href="#table-of-contents">Table of Contents</a></li>
 <li><a href="#create-a-gcp-account--project">Create a GCP Account &amp; Project</a></li>
-<li><a href="#create-a-gke-cluster">Create a GKE Cluster</a>
-
-<ul>
-<li><a href="#pre-emptible-instances">Pre-emptible Instances</a></li>
-</ul></li>
-<li><a href="#optimizations">Optimizations</a>
-
-<ul>
-<li><a href="#fluentd-gcp-scaler">fluentd-gcp-scaler</a></li>
-<li><a href="#kube-dns-autoscaler">kube-dns-autoscaler</a></li>
-</ul></li>
+<li><a href="#create-a-gke-cluster">Create a GKE Cluster</a></li>
 <li><a href="#resource-utilization-overview">Resource Utilization Overview</a></li>
 <li><a href="#deploy-nginx-ingress">Deploy Nginx Ingress</a></li>
 <li><a href="#create-a-firewall-rule-to-allow-traffic-to-the-nodes">Create a firewall rule to allow traffic to the nodes</a></li>
@@ -176,74 +166,47 @@ gcloud beta container <span class="se">\
 </span><span class="se"></span>  --maintenance-window-start <span class="s2">&#34;2019-11-15T10:00:00Z&#34;</span> <span class="se">\
 </span><span class="se"></span>  --maintenance-window-end <span class="s2">&#34;2019-11-15T14:00:00Z&#34;</span> <span class="se">\
 </span><span class="se"></span>  --maintenance-window-recurrence <span class="s2">&#34;FREQ=WEEKLY;BYDAY=MO,TU,WE,TH&#34;</span></code></pre></div>
-<ul>
-<li><code>--project</code> - change this to your project name</li>
-<li><code>hobby-1</code> - change this to a cluster name of your choosing</li>
-<li><code>--zone &quot;us-west1-a&quot;</code> - I chose <code>us-west1-a</code> because it&rsquo;s the cheapest region in the US (<code>us-central1</code> is the same low price), and that&rsquo;s also where I live. I don&rsquo;t plan on running anything that would have any significant performance impact for users from say the east coast, so this is not much of concern. I&rsquo;ll talk more about this in the next section, <a href="#zones-regions-and-other-network-to-consider">Zones, Regions, and other networking to consider</a>.</li>
-<li><code>--no-enable-basic-auth</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--release-chanel &quot;regular&quot;</code> -  I chose to keep my cluster regularly upgraded, since this was a hobby cluster, I don&rsquo;t really mind, and it&rsquo;s may also later become a good exercise in managing availability.</li>
-<li><code>--machine-type &quot;g1-small&quot;</code> - <a href="https://cloud.google.com/compute/vm-instance-pricing#sharedcore">a <code>g1-small</code> is $5.11 per month when pre-emptible</a>. More on <a href="#pre-emptible-instances">pre-emptible instances below</a>. As of this post, the <code>f1-micro</code> is too small to run while also enabling the stackdriver addon.</li>
-<li><code>--image-type &quot;COS&quot;</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--disk-type &quot;pd-standard&quot;</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--disk-size 30</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--metadata disable-legacy-endpoints=true</code> - this was a default setting for clusters &gt; <code>1.12</code></li>
-<li><code>--scopes ...</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--preemptible</code> - This is important, as stated above, the cost is significantly less. More on <a href="#pre-emptible-instances">pre-emptible instances below</a></li>
-<li><code>--no-nodes &quot;1&quot;</code> - This will create 3 nodes (1 per zone) in the default node pool. We&rsquo;ll delete that node pool as soon as the cluster comes up, so don&rsquo;t worry about this much.</li>
-<li><code>--enable-stackdriver-kubernetes</code> - Stackdriver is <a href="https://cloud.google.com/stackdriver/">mostly free</a>, if you use it sparingly, so let&rsquo;s enable this so we can monitor our cluster.</li>
-<li><code>--enable-ip-alias</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--network ...</code> - <em>REQUIRED</em></li>
-<li><code>--subnetwork ...</code> - <em>REQUIRED</em></li>
-<li><code>--default-max-pods-per-node &quot;110&quot;</code> - <em>REASONABLE DEFAULT</em></li>
-<li><code>--enable-master-authorized-networks</code> - This is to restrict who can access the master nodes (K8s API). The next setting will use your home IP address.</li>
-<li><code>--master-authorized-networks &quot;${MY_HOME_IP}/32&quot;</code> - Restrict access to the K8s API to your home IP address. This can be updated on demand, and <a href="#updating-cluster-authorized-networks">I&rsquo;ll show you how to do that later</a>.</li>
-<li><code>--addons HorizontalPodAutoscaling</code> - This is not needed, since you probably won&rsquo;t use it, but doesn&rsquo;t hurt.</li>
-<li><code>--enable-autoupgrade</code> - I checked this cause with a regional cluster, I don&rsquo;t really want to upgrade manually.</li>
-<li><code>--enable-autorepair</code> - Seems like a good idea.</li>
-<li><code>--maintennce-window-*</code> - Choose what&rsquo;s right for you. For my purposes, I expect more traffic during the weekend, so I&rsquo;m restricting maintence to 2AM on the weekdays.</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>option</th>
+<th>description</th>
+</tr>
+</thead>
 
-<p>This command will immediately create a cluster and a node pool with 3 nodes in it. That&rsquo;s a bit too much for my liking, so let&rsquo;s delete the default node pool, and recreate it so that there&rsquo;s only 1 node in it.</p>
+<tbody>
+<tr>
+<td><code>--zone &quot;us-west1-a&quot;</code></td>
+<td>I chose <code>us-west1-a</code> because it&rsquo;s the cheapest region in the US (<code>us-central1</code> is the same low price), and that&rsquo;s also where I live. I don&rsquo;t plan on running anything that would have any significant performance impact for users from say the east coast, so this is not much of concern. I&rsquo;ll talk more about this in the next section, <a href="#zones-regions-and-other-network-to-consider">Zones, Regions, and other networking to consider</a>.</td>
+</tr>
 
-<h3 id="pre-emptible-instances">Pre-emptible Instances<a href="#pre-emptible-instances" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
+<tr>
+<td><code>--machine-type &quot;g1-small&quot;</code></td>
+<td><a href="https://cloud.google.com/compute/vm-instance-pricing#sharedcore">a <code>g1-small</code> is $5.11 per month when pre-emptible</a>. As of this post, the <code>f1-micro</code> is too small to run while also enabling the stackdriver addon. You can read more about preemptible instances from the offical docs: <a href="https://cloud.google.com/compute/docs/instances/preemptible">https://cloud.google.com/compute/docs/instances/preemptible</a></td>
+</tr>
 
-<p>You can read more about preemptible instances from the offical docs:</p>
+<tr>
+<td><code>--enable-stackdriver-kubernetes</code></td>
+<td>Stackdriver is <a href="https://cloud.google.com/stackdriver/">mostly free</a>, if you use it sparingly, so let&rsquo;s enable this so we can monitor our cluster.</td>
+</tr>
 
-<p><a href="https://cloud.google.com/compute/docs/instances/preemptible">https://cloud.google.com/compute/docs/instances/preemptible</a></p>
+<tr>
+<td><code>--enable-master-authorized-networks</code></td>
+<td>This is to restrict who can access the master nodes (K8s API). The next setting will use your home IP address.</td>
+</tr>
 
-<h2 id="optimizations">Optimizations<a href="#optimizations" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
+<tr>
+<td><code>--master-authorized-networks &quot;${MY_HOME_IP}/32&quot;</code></td>
+<td>Restrict access to the K8s API to your home IP address. This can be updated on demand, and <a href="#updating-cluster-authorized-networks">I&rsquo;ll show you how to do that later</a>.</td>
+</tr>
 
-<p>When the cluster comes up, you&rsquo;ll already have quite a few deployed pods on the cluster. If this was a large cluster, the defaults would probably be fine. But we are on a budget! So we need to modify some of these.</p>
+<tr>
+<td><code>--maintennce-window-*</code></td>
+<td>Choose what&rsquo;s right for you. For my purposes, I expect more traffic during the weekend, so I&rsquo;m restricting maintence to 2AM on the weekdays.</td>
+</tr>
+</tbody>
+</table>
 
-<p>Some of this can be found in google&rsquo;s docs <a href="https://cloud.google.com/kubernetes-engine/docs/how-to/small-cluster-tuning">small-cluster-tuning</a>.</p>
-
-<p>First, you&rsquo;ll need to authenticate to the cluster to run kubectl commands.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">gcloud container clusters get-credentials hobby-1 --zone us-west1-a --project kubernetes-on-the-cheap</code></pre></div>
-<p>Here we can get a quick glance at what&rsquo;s running, and it&rsquo;s actual usage. Note that cpu/mem requests can and usually are greater than idle usage. The kubernetes schedule will refuse to deploy pods if the sum of requested resources is greater than the allocatable amount for that resource.</p>
-<div class="highlight"><pre class="chroma"><code class="language-txt" data-lang="txt">k -n kube-system top pods
-NAME                                                        CPU(cores)   MEMORY(bytes)
-event-exporter-v0.2.5-7df89f4b8f-bh7gj                      1m           16Mi
-fluentd-gcp-scaler-54ccb89d5-x9w4n                          0m           32Mi
-fluentd-gcp-v3.1.1-tmzdc                                    11m          134Mi
-heapster-dbf95c595-5zg5m                                    1m           34Mi
-kube-dns-5877696fb4-hwwtt                                   2m           27Mi
-kube-dns-autoscaler-85f8bdb54-jhvsj                         1m           3Mi
-kube-proxy-gke-hobby-1-default-pool-d97956f1-dzjm           1m           11Mi
-metrics-server-v0.3.1-8d4c5db46-np6pl                       1m           16Mi
-prometheus-to-sd-z2kw7                                      1m           11Mi
-stackdriver-metadata-agent-cluster-level-684c9bb574-vkjhw   4m           17Mi</code></pre></div>
-<p>We&rsquo;ll be able to recover some of this (detailed below). But the rest is outside of our control, since these are GKE addons. Any modification to them simply gets reverted.</p>
-
-<h3 id="fluentd-gcp-scaler">fluentd-gcp-scaler<a href="#fluentd-gcp-scaler" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-
-<p>This is part of the StackDriver addon.</p>
-
-<p>I believe this is similar to a <code>VerticalPodAutoscaler</code>, which I don&rsquo;t need, so here&rsquo;s how to disable it. Thankfully this is one of the deployments that doesn&rsquo;t mind being scaled to 0.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">k -n kube-system scale deployment fluentd-gcp-scaler --replicas<span class="o">=</span><span class="m">0</span></code></pre></div>
-<h3 id="kube-dns-autoscaler">kube-dns-autoscaler<a href="#kube-dns-autoscaler" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h3>
-
-<p>I don&rsquo;t need kube-dns to scale, so here&rsquo;s how to disable this.</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">k -n kube-system scale deployment kube-dns-autoscaler --replicas<span class="o">=</span><span class="m">0</span></code></pre></div>
 <h2 id="resource-utilization-overview">Resource Utilization Overview<a href="#resource-utilization-overview" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <table>
@@ -354,7 +317,7 @@ kubectl apply -f hello.yaml</code></pre></div>
 					<line x1="16" y1="13" x2="8" y2="13"></line>
 					<line x1="16" y1="17" x2="8" y2="17"></line>
 					<polyline points="10 9 9 9 8 9"></polyline>
-				</svg>1699 Words</p>
+				</svg>1186 Words</p>
 			<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 					class="feather feather-calendar">
