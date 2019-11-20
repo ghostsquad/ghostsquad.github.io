@@ -17,10 +17,6 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 - [Table of Contents](#table-of-contents)
 - [Create a GCP Account & Project](#create-a-gcp-account--project)
 - [Create a GKE Cluster](#create-a-gke-cluster)
-  - [Pre-emptible Instances](#pre-emptible-instances)
-- [Optimizations](#optimizations)
-  - [fluentd-gcp-scaler](#fluentd-gcp-scaler)
-  - [kube-dns-autoscaler](#kube-dns-autoscaler)
 - [Resource Utilization Overview](#resource-utilization-overview)
 - [Deploy Nginx Ingress](#deploy-nginx-ingress)
 - [Create a firewall rule to allow traffic to the nodes](#create-a-firewall-rule-to-allow-traffic-to-the-nodes)
@@ -100,87 +96,14 @@ gcloud beta container \
   --maintenance-window-recurrence "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH"
 ```
 
-* `--project` - change this to your project name
-* `hobby-1` - change this to a cluster name of your choosing
-* `--zone "us-west1-a"` - I chose `us-west1-a` because it's the cheapest region in the US (`us-central1` is the same low price), and that's also where I live. I don't plan on running anything that would have any significant performance impact for users from say the east coast, so this is not much of concern. I'll talk more about this in the next section, [Zones, Regions, and other networking to consider](#zones-regions-and-other-network-to-consider).
-* `--no-enable-basic-auth` - _REASONABLE DEFAULT_
-* `--release-chanel "regular"` -  I chose to keep my cluster regularly upgraded, since this was a hobby cluster, I don't really mind, and it's may also later become a good exercise in managing availability.
-* `--machine-type "g1-small"` - [a `g1-small` is $5.11 per month when pre-emptible](https://cloud.google.com/compute/vm-instance-pricing#sharedcore). More on [pre-emptible instances below](#pre-emptible-instances). As of this post, the `f1-micro` is too small to run while also enabling the stackdriver addon.
-* `--image-type "COS"` - _REASONABLE DEFAULT_
-* `--disk-type "pd-standard"` - _REASONABLE DEFAULT_
-* `--disk-size 30` - _REASONABLE DEFAULT_
-* `--metadata disable-legacy-endpoints=true` - this was a default setting for clusters > `1.12`
-* `--scopes ...` - _REASONABLE DEFAULT_
-* `--preemptible` - This is important, as stated above, the cost is significantly less. More on [pre-emptible instances below](#pre-emptible-instances)
-* `--no-nodes "1"` - This will create 3 nodes (1 per zone) in the default node pool. We'll delete that node pool as soon as the cluster comes up, so don't worry about this much.
-* `--enable-stackdriver-kubernetes` - Stackdriver is [mostly free](https://cloud.google.com/stackdriver/), if you use it sparingly, so let's enable this so we can monitor our cluster.
-* `--enable-ip-alias` - _REASONABLE DEFAULT_
-* `--network ...` - _REQUIRED_
-* `--subnetwork ...` - _REQUIRED_
-* `--default-max-pods-per-node "110"` - _REASONABLE DEFAULT_
-* `--enable-master-authorized-networks` - This is to restrict who can access the master nodes (K8s API). The next setting will use your home IP address.
-* `--master-authorized-networks "${MY_HOME_IP}/32"` - Restrict access to the K8s API to your home IP address. This can be updated on demand, and [I'll show you how to do that later](#updating-cluster-authorized-networks).
-* `--addons HorizontalPodAutoscaling` - This is not needed, since you probably won't use it, but doesn't hurt.
-* `--enable-autoupgrade` - I checked this cause with a regional cluster, I don't really want to upgrade manually.
-* `--enable-autorepair` - Seems like a good idea.
-* `--maintennce-window-*` - Choose what's right for you. For my purposes, I expect more traffic during the weekend, so I'm restricting maintence to 2AM on the weekdays.
-
-This command will immediately create a cluster and a node pool with 3 nodes in it. That's a bit too much for my liking, so let's delete the default node pool, and recreate it so that there's only 1 node in it.
-
-### Pre-emptible Instances
-
-You can read more about preemptible instances from the offical docs:
-
-[https://cloud.google.com/compute/docs/instances/preemptible](https://cloud.google.com/compute/docs/instances/preemptible)
-
-## Optimizations
-
-When the cluster comes up, you'll already have quite a few deployed pods on the cluster. If this was a large cluster, the defaults would probably be fine. But we are on a budget! So we need to modify some of these.
-
-Some of this can be found in google's docs [small-cluster-tuning](https://cloud.google.com/kubernetes-engine/docs/how-to/small-cluster-tuning).
-
-First, you'll need to authenticate to the cluster to run kubectl commands.
-
-```bash
-gcloud container clusters get-credentials hobby-1 --zone us-west1-a --project kubernetes-on-the-cheap
-```
-
-Here we can get a quick glance at what's running, and it's actual usage. Note that cpu/mem requests can and usually are greater than idle usage. The kubernetes schedule will refuse to deploy pods if the sum of requested resources is greater than the allocatable amount for that resource.
-
-```txt
-k -n kube-system top pods
-NAME                                                        CPU(cores)   MEMORY(bytes)
-event-exporter-v0.2.5-7df89f4b8f-bh7gj                      1m           16Mi
-fluentd-gcp-scaler-54ccb89d5-x9w4n                          0m           32Mi
-fluentd-gcp-v3.1.1-tmzdc                                    11m          134Mi
-heapster-dbf95c595-5zg5m                                    1m           34Mi
-kube-dns-5877696fb4-hwwtt                                   2m           27Mi
-kube-dns-autoscaler-85f8bdb54-jhvsj                         1m           3Mi
-kube-proxy-gke-hobby-1-default-pool-d97956f1-dzjm           1m           11Mi
-metrics-server-v0.3.1-8d4c5db46-np6pl                       1m           16Mi
-prometheus-to-sd-z2kw7                                      1m           11Mi
-stackdriver-metadata-agent-cluster-level-684c9bb574-vkjhw   4m           17Mi
-```
-
-We'll be able to recover some of this (detailed below). But the rest is outside of our control, since these are GKE addons. Any modification to them simply gets reverted.
-
-### fluentd-gcp-scaler
-
-This is part of the StackDriver addon.
-
-I believe this is similar to a `VerticalPodAutoscaler`, which I don't need, so here's how to disable it. Thankfully this is one of the deployments that doesn't mind being scaled to 0.
-
-```bash
-k -n kube-system scale deployment fluentd-gcp-scaler --replicas=0
-```
-
-### kube-dns-autoscaler
-
-I don't need kube-dns to scale, so here's how to disable this.
-
-```bash
-k -n kube-system scale deployment kube-dns-autoscaler --replicas=0
-```
+| option                                            | description                    |
+|---------------------------------------------------| -------------------------------|
+| `--zone "us-west1-a"`                             | I chose `us-west1-a` because it's the cheapest region in the US (`us-central1` is the same low price), and that's also where I live. I don't plan on running anything that would have any significant performance impact for users from say the east coast, so this is not much of concern. I'll talk more about this in the next section, [Zones, Regions, and other networking to consider](#zones-regions-and-other-network-to-consider). |
+| `--machine-type "g1-small"`                       | [a `g1-small` is $5.11 per month when pre-emptible](https://cloud.google.com/compute/vm-instance-pricing#sharedcore). As of this post, the `f1-micro` is too small to run while also enabling the stackdriver addon. You can read more about preemptible instances from the offical docs: [https://cloud.google.com/compute/docs/instances/preemptible](https://cloud.google.com/compute/docs/instances/preemptible) |
+| `--enable-stackdriver-kubernetes`                 | Stackdriver is [mostly free](https://cloud.google.com/stackdriver/), if you use it sparingly, so let's enable this so we can monitor our cluster. |
+| `--enable-master-authorized-networks`             | This is to restrict who can access the master nodes (K8s API). The next setting will use your home IP address. |
+| `--master-authorized-networks "${MY_HOME_IP}/32"` | Restrict access to the K8s API to your home IP address. This can be updated on demand, and [I'll show you how to do that later](#updating-cluster-authorized-networks). |
+| `--maintennce-window-*`                           | Choose what's right for you. For my purposes, I expect more traffic during the weekend, so I'm restricting maintence to 2AM on the weekdays. |
 
 ## Resource Utilization Overview
 
