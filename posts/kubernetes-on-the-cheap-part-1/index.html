@@ -13,8 +13,8 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 
 
 <meta itemprop="datePublished" content="2019-11-16T17:49:17-08:00" />
-<meta itemprop="dateModified" content="2019-11-19T20:18:34-08:00" />
-<meta itemprop="wordCount" content="1186">
+<meta itemprop="dateModified" content="2019-11-20T22:30:32-08:00" />
+<meta itemprop="wordCount" content="1238">
 
 
 
@@ -25,7 +25,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/" />
 <meta property="article:published_time" content="2019-11-16T17:49:17-08:00" />
-<meta property="article:modified_time" content="2019-11-19T20:18:34-08:00" />
+<meta property="article:modified_time" content="2019-11-20T22:30:32-08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kubernetes on the Cheap - Part 1"/>
 <meta name="twitter:description" content="How to run Kubernetes for less than $6 per month?
@@ -39,7 +39,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 	<link rel="shortcut icon" href="/favicon.ico">
 
 	<title>Kubernetes on the Cheap - Part 1</title>
-	<link rel="stylesheet" href="https://ghostsquad.me/css/style.min.5ee5e7976cd09872c64e40a582206543f6aa38c69a8c43898aadc70040344b92.css" integrity="sha256-XuXnl2zQmHLGTkClgiBlQ/aqOMaajEOJiq3HAEA0S5I=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://ghostsquad.me/css/style.min.adb4e738c83b4cc0eea8000ca83f72188a2ac1fd188a1e6f7cea8a7fa75cd7b1.css" integrity="sha256-rbTnOMg7TMDuqAAMqD9yGIoqwf0Yih5vfOqKf6dc17E=" crossorigin="anonymous">
 <script defer src="/fontawesome/brands.min.js"></script>
 <script defer src="/fontawesome/regular.min.js"></script>
 <script defer src="/fontawesome/fontawesome.min.js"></script>
@@ -82,7 +82,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 					<span><span class="far fa-clock"></span>&nbsp;Nov 16, 2019</span>
 					<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
 					<span><span
-							class="far fa-edit"></span>&nbsp;Nov 19, 2019</span></span>
+							class="far fa-edit"></span>&nbsp;Nov 20, 2019</span></span>
 				<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
 				<span><span class="far fa-hourglass"></span>&nbsp;6 min</span>
 			</div>
@@ -122,6 +122,8 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">alias</span> <span class="nv">k</span><span class="o">=</span>kubectl</code></pre></div>
 <p>or</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&#34;alias k=kubectl&#34;</span> &gt;&gt; <span class="nv">$HOME</span>/.bashrc</code></pre></div>
+<p>To make your life easier, I&rsquo;ve variablized the commands in this post, so that you can simply set the variables, then copy/paste the commands without much trouble.</p>
+
 <h2 id="create-a-gke-cluster">Create a GKE Cluster<a href="#create-a-gke-cluster" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
 
 <p>GKE (Google Kubernetes Engine) is actually FREE on GCP&hellip; well the master nodes are. You can create a cluster without any worker nodes at no cost. That&rsquo;s the next step. First, navigate to <a href="https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap">https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap</a> but replacing the <code>project</code> with your own project name. Google has to enable the <code>Kubernetes Engine API</code>, and it takes a few minutes.</p>
@@ -134,14 +136,15 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">MY_HOME_IP</span><span class="o">=</span><span class="s2">&#34;</span><span class="k">$(</span>curl https://ifconfig.co/ip<span class="k">)</span><span class="s2">&#34;</span>
 <span class="nb">echo</span> <span class="s2">&#34;MY_HOME_IP=</span><span class="si">${</span><span class="nv">MY_HOME_IP</span><span class="si">}</span><span class="s2">&#34;</span></code></pre></div>
 <p>Run this from the Cloud Shell console</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
-<span class="nv">REGION</span><span class="o">=</span><span class="s2">&#34;us-west1&#34;</span>
-<span class="nv">ZONE_ID</span><span class="o">=</span><span class="s2">&#34;a&#34;</span>
-<span class="nv">ZONE</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">ZONE_ID</span><span class="si">}</span><span class="s2">&#34;</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
+<span class="nb">export</span> <span class="nv">CLUSTER_NAME</span><span class="o">=</span><span class="s2">&#34;hobby-1&#34;</span>
+<span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span><span class="s2">&#34;us-west1&#34;</span>
+<span class="nb">export</span> <span class="nv">ZONE_ID</span><span class="o">=</span><span class="s2">&#34;a&#34;</span>
+<span class="nb">export</span> <span class="nv">ZONE</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">ZONE_ID</span><span class="si">}</span><span class="s2">&#34;</span>
 
 gcloud beta container <span class="se">\
 </span><span class="se"></span>  --project <span class="s2">&#34;</span><span class="si">${</span><span class="nv">PROJECT_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
-</span><span class="se"></span>  clusters create <span class="s2">&#34;hobby-1&#34;</span> <span class="se">\
+</span><span class="se"></span>  clusters create <span class="s2">&#34;</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
 </span><span class="se"></span>  --zone <span class="s2">&#34;</span><span class="si">${</span><span class="nv">ZONE</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
 </span><span class="se"></span>  --no-enable-basic-auth <span class="se">\
 </span><span class="se"></span>  --release-channel <span class="s2">&#34;regular&#34;</span> <span class="se">\
@@ -258,9 +261,9 @@ gcloud beta container <span class="se">\
 </ul>
 
 <p>Run this to deploy the nginx ingress controller:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl apply -f https://ghostsquad.me/files/nginx-ingress-controller.yaml</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl apply -f https://ghostsquad.me/files/kubernetes-on-the-cheap-part-1/nginx-ingress-controller.yaml</code></pre></div>
 <h2 id="create-a-firewall-rule-to-allow-traffic-to-the-nodes">Create a firewall rule to allow traffic to the nodes<a href="#create-a-firewall-rule-to-allow-traffic-to-the-nodes" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TARGET_TAG</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].tags.items[0]&#39;</span><span class="k">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">TARGET_TAG</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].tags.items[0]&#39;</span><span class="k">)</span>
 
 gcloud compute <span class="se">\
 </span><span class="se"></span>  --project<span class="o">=</span>kubernetes-on-the-cheap <span class="se">\
@@ -273,14 +276,17 @@ gcloud compute <span class="se">\
 </span><span class="se"></span>  --source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0 <span class="se">\
 </span><span class="se"></span>  --target-tags<span class="o">=</span><span class="nv">$TARGET_TAG</span></code></pre></div>
 <h2 id="deploy-a-simple-app">Deploy a simple app<a href="#deploy-a-simple-app" class="anchor" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3"></path><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></h2>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">EXT_IP</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].networkInterfaces[0].accessConfigs[0].natIP&#39;</span><span class="k">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">EXT_IP</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].networkInterfaces[0].accessConfigs[0].natIP&#39;</span><span class="k">)</span>
 <span class="nb">echo</span> <span class="nv">$EXT_IP</span>
-<span class="nv">HOST</span><span class="o">=</span><span class="s2">&#34;test.</span><span class="si">${</span><span class="nv">EXT_IP</span><span class="si">}</span><span class="s2">.xip.io&#34;</span>
-<span class="nb">echo</span> <span class="nv">$HOST</span>
 
-curl https://ghostsquad.me/files/hello.yaml -o hello.yaml
-sed -i <span class="s2">&#34;s/__HOST__/</span><span class="si">${</span><span class="nv">HOST</span><span class="si">}</span><span class="s2">/g&#34;</span> hello.yaml
-kubectl apply -f hello.yaml</code></pre></div>
+kubectl apply -f https://ghostsquad.me/files/kubernetes-on-the-cheap-part-1/hello.yaml</code></pre></div>
+<p>You should now be able to visit the IP address in <code>$EXT_IP</code> and see something like this:</p>
+
+<pre><code>Hello, world!
+Version: 1.0.0
+Hostname: hello-567b7dcdc9-vgb8v
+</code></pre>
+
 <p>This works, but we have one major issue, and that&rsquo;s the node IP address will change every 24 hours because the instance is pre-emptible. (and also this means the <code>host</code> in the ingress will need to be updated every 24 hours)</p>
 
 <p>We&rsquo;ll address this in the next part of this series!</p>
@@ -297,6 +303,8 @@ kubectl apply -f hello.yaml</code></pre></div>
 <li>Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</li>
 <li>Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</li>
 </ul>
+
+<p>Head over to <a href="/posts/kubernetes-on-the-cheap-part-2/">part 2</a></p>
 
 		</div>
 		<hr class="post-end">
@@ -317,7 +325,7 @@ kubectl apply -f hello.yaml</code></pre></div>
 					<line x1="16" y1="13" x2="8" y2="13"></line>
 					<line x1="16" y1="17" x2="8" y2="17"></line>
 					<polyline points="10 9 9 9 8 9"></polyline>
-				</svg>1186 Words</p>
+				</svg>1238 Words</p>
 			<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 					class="feather feather-calendar">
@@ -329,6 +337,14 @@ kubectl apply -f hello.yaml</code></pre></div>
 		</footer>
 	</article>
 	<div class="post-nav thin">
+		<a class="next-post" href="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-2/">
+			<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+					viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round" class="feather feather-arrow-left">
+					<line x1="19" y1="12" x2="5" y2="12"></line>
+					<polyline points="12 19 5 12 12 5"></polyline>
+				</svg>&nbsp;Newer</span><br><span>Kubernetes on the Cheap - Part 2</span>
+		</a>
 		<a class="prev-post" href="https://ghostsquad.me/posts/the-little-things/">
 			<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24"
 					height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

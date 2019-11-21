@@ -6,8 +6,87 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>en-us</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Sat, 16 Nov 2019 17:49:17 -0800</lastBuildDate>
+		<lastBuildDate>Mon, 18 Nov 2019 09:47:28 -0800</lastBuildDate>
 		<atom:link href="https://ghostsquad.me/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Kubernetes on the Cheap - Part 2</title>
+			<link>https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-2/</link>
+			<pubDate>Mon, 18 Nov 2019 09:47:28 -0800</pubDate>
+			
+			<guid>https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-2/</guid>
+			<description>If you haven&amp;rsquo;t read part 1 yet, that&amp;rsquo;s a good place to start.
+In the last post, we were left with a kubernetes cluster, and a test deployment that would break once every 24 hours, because of the preemptible instances we are using. So the highest priority right now is to fix that.
+The next step is going to require you to own a domain. I recommend namecheap. You can get a .</description>
+			<content type="html"><![CDATA[
+
+<p>If you haven&rsquo;t read <a href="/posts/kubernetes-on-the-cheap-part-1/">part 1</a> yet, that&rsquo;s a good place to start.</p>
+
+<p>In the last post, we were left with a kubernetes cluster, and a test deployment that would break once every 24 hours, because of the preemptible instances we are using. So the highest priority right now is to fix that.</p>
+
+<p>The next step is going to require you to own a domain. I recommend <a href="https://namecheap.com">namecheap</a>. You can get a <code>.com</code> for $8.88/yr for the first year, then $10.98/yr after that.</p>
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#create-a-dns-zone">Create a DNS Zone</a></li>
+<li><a href="#deploy-external-dns-controller">Deploy External DNS Controller</a></li>
+<li><a href="#edit-the-hello-app-to-include-the-domain-and-updated-ttl">Edit the hello app to include the domain, and updated ttl</a></li>
+</ul>
+
+<p>To make your life easier, I&rsquo;ve variablized the commands in this post, so that you can simply set the variables, then copy/paste the commands without much trouble.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
+<span class="nb">export</span> <span class="nv">CLUSTER_NAME</span><span class="o">=</span><span class="s2">&#34;hobby-1&#34;</span>
+<span class="nb">export</span> <span class="nv">DOMAIN</span><span class="o">=</span><span class="s2">&#34;foo.com&#34;</span></code></pre></div>
+<h2 id="create-a-dns-zone">Create a DNS Zone</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">gcloud beta dns <span class="se">\
+</span><span class="se"></span>  managed-zones create <span class="s2">&#34;</span><span class="si">${</span><span class="nv">DOMAIN</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span><span class="se"></span>  --description<span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">DOMAIN</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span><span class="se"></span>  --dns-name<span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">DOMAIN</span><span class="si">}</span><span class="s2">.&#34;</span></code></pre></div>
+<h2 id="deploy-external-dns-controller">Deploy External DNS Controller</h2>
+
+<p>Some of these steps came from <a href="https://knative.dev/docs/serving/using-external-dns-on-gcp/">knative</a></p>
+
+<ol>
+<li><p>Create a new service account for Cloud DNS admin role.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">CLOUD_DNS_SA</span><span class="o">=</span>cloud-dns-admin
+
+gcloud --project <span class="nv">$PROJECT_NAME</span> iam service-accounts <span class="se">\
+</span><span class="se"></span>    create <span class="nv">$CLOUD_DNS_SA</span> <span class="se">\
+</span><span class="se"></span>    --display-name <span class="s2">&#34;Service Account to support ACME DNS-01 challenge.&#34;</span></code></pre></div></li>
+
+<li><p>Bind the role <code>dns.admin</code> to the newly created service account.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="c1"># Fully-qualified service account name also has project-id information.</span>
+<span class="nb">export</span> <span class="nv">CLOUD_DNS_SA_FQ</span><span class="o">=</span><span class="nv">$CLOUD_DNS_SA</span>@<span class="nv">$PROJECT_NAME</span>.iam.gserviceaccount.com
+
+gcloud projects add-iam-policy-binding <span class="nv">$PROJECT_NAME</span> <span class="se">\
+</span><span class="se"></span>    --member serviceAccount:<span class="nv">$CLOUD_DNS_SA_FQ</span> <span class="se">\
+</span><span class="se"></span>    --role roles/dns.admin</code></pre></div></li>
+
+<li><p>Download the secret key file for your service account.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">gcloud iam service-accounts keys create ~/credentials.json <span class="se">\
+</span><span class="se"></span>  --iam-account<span class="o">=</span><span class="nv">$CLOUD_DNS_SA_FQ</span></code></pre></div></li>
+
+<li><p>Upload the service account credential to your cluster. This command uses the secret name <code>cloud-dns-key</code>, but you can choose a different name.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">CLOUD_DNS_SECRET_NAME</span><span class="o">=</span><span class="s2">&#34;cloud-dns-key&#34;</span>
+
+kubectl create secret generic <span class="s2">&#34;</span><span class="si">${</span><span class="nv">CLOUD_DNS_SECRET_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
+</span><span class="se"></span>  --from-file<span class="o">=</span>credentials.json<span class="o">=</span><span class="nv">$HOME</span>/credentials.json</code></pre></div></li>
+
+<li><p>Deploy external dns.</p>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">curl https://ghostsquad.me/files/kubernetes-on-the-cheap-part-2/external-dns.yaml -o external-dns.yaml
+sed -i <span class="s2">&#34;s/__PROJECT_NAME__/</span><span class="si">${</span><span class="nv">PROJECT_NAME</span><span class="si">}</span><span class="s2">/g&#34;</span> external-dns.yaml
+sed -i <span class="s2">&#34;s/__CLUSTER_NAME__/</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">/g&#34;</span> external-dns.yaml
+sed -i <span class="s2">&#34;s/__CLOUD_DNS_SECRET_NAME__/</span><span class="si">${</span><span class="nv">CLOUD_DNS_SECRET_NAME</span><span class="si">}</span><span class="s2">/g&#34;</span> external-dns.yaml
+kubectl apply -f external-dns.yaml</code></pre></div></li>
+</ol>
+
+<h2 id="edit-the-hello-app-to-include-the-domain-and-updated-ttl">Edit the hello app to include the domain, and updated ttl</h2>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">curl https://ghostsquad.me/files/kubernetes-on-the-cheap-part-2/hello.yaml -o hello-part-2.yaml
+sed -i <span class="s2">&#34;s/__DOMAIN__/</span><span class="si">${</span><span class="nv">DOMAIN</span><span class="si">}</span><span class="s2">/g&#34;</span> hello-part-2.yaml
+kubectl apply -f hello-part-2.yaml</code></pre></div>]]></content>
+		</item>
 		
 		<item>
 			<title>Kubernetes on the Cheap - Part 1</title>
@@ -51,6 +130,8 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">alias</span> <span class="nv">k</span><span class="o">=</span>kubectl</code></pre></div>
 <p>or</p>
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">echo</span> <span class="s2">&#34;alias k=kubectl&#34;</span> &gt;&gt; <span class="nv">$HOME</span>/.bashrc</code></pre></div>
+<p>To make your life easier, I&rsquo;ve variablized the commands in this post, so that you can simply set the variables, then copy/paste the commands without much trouble.</p>
+
 <h2 id="create-a-gke-cluster">Create a GKE Cluster</h2>
 
 <p>GKE (Google Kubernetes Engine) is actually FREE on GCP&hellip; well the master nodes are. You can create a cluster without any worker nodes at no cost. That&rsquo;s the next step. First, navigate to <a href="https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap">https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap</a> but replacing the <code>project</code> with your own project name. Google has to enable the <code>Kubernetes Engine API</code>, and it takes a few minutes.</p>
@@ -63,14 +144,15 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">MY_HOME_IP</span><span class="o">=</span><span class="s2">&#34;</span><span class="k">$(</span>curl https://ifconfig.co/ip<span class="k">)</span><span class="s2">&#34;</span>
 <span class="nb">echo</span> <span class="s2">&#34;MY_HOME_IP=</span><span class="si">${</span><span class="nv">MY_HOME_IP</span><span class="si">}</span><span class="s2">&#34;</span></code></pre></div>
 <p>Run this from the Cloud Shell console</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
-<span class="nv">REGION</span><span class="o">=</span><span class="s2">&#34;us-west1&#34;</span>
-<span class="nv">ZONE_ID</span><span class="o">=</span><span class="s2">&#34;a&#34;</span>
-<span class="nv">ZONE</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">ZONE_ID</span><span class="si">}</span><span class="s2">&#34;</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">PROJECT_NAME</span><span class="o">=</span><span class="s2">&#34;kubernetes-on-the-cheap&#34;</span>
+<span class="nb">export</span> <span class="nv">CLUSTER_NAME</span><span class="o">=</span><span class="s2">&#34;hobby-1&#34;</span>
+<span class="nb">export</span> <span class="nv">REGION</span><span class="o">=</span><span class="s2">&#34;us-west1&#34;</span>
+<span class="nb">export</span> <span class="nv">ZONE_ID</span><span class="o">=</span><span class="s2">&#34;a&#34;</span>
+<span class="nb">export</span> <span class="nv">ZONE</span><span class="o">=</span><span class="s2">&#34;</span><span class="si">${</span><span class="nv">REGION</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">ZONE_ID</span><span class="si">}</span><span class="s2">&#34;</span>
 
 gcloud beta container <span class="se">\
 </span><span class="se"></span>  --project <span class="s2">&#34;</span><span class="si">${</span><span class="nv">PROJECT_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
-</span><span class="se"></span>  clusters create <span class="s2">&#34;hobby-1&#34;</span> <span class="se">\
+</span><span class="se"></span>  clusters create <span class="s2">&#34;</span><span class="si">${</span><span class="nv">CLUSTER_NAME</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
 </span><span class="se"></span>  --zone <span class="s2">&#34;</span><span class="si">${</span><span class="nv">ZONE</span><span class="si">}</span><span class="s2">&#34;</span> <span class="se">\
 </span><span class="se"></span>  --no-enable-basic-auth <span class="se">\
 </span><span class="se"></span>  --release-channel <span class="s2">&#34;regular&#34;</span> <span class="se">\
@@ -187,9 +269,9 @@ gcloud beta container <span class="se">\
 </ul>
 
 <p>Run this to deploy the nginx ingress controller:</p>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl apply -f https://ghostsquad.me/files/nginx-ingress-controller.yaml</code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash">kubectl apply -f https://ghostsquad.me/files/kubernetes-on-the-cheap-part-1/nginx-ingress-controller.yaml</code></pre></div>
 <h2 id="create-a-firewall-rule-to-allow-traffic-to-the-nodes">Create a firewall rule to allow traffic to the nodes</h2>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">TARGET_TAG</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].tags.items[0]&#39;</span><span class="k">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">TARGET_TAG</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].tags.items[0]&#39;</span><span class="k">)</span>
 
 gcloud compute <span class="se">\
 </span><span class="se"></span>  --project<span class="o">=</span>kubernetes-on-the-cheap <span class="se">\
@@ -202,14 +284,17 @@ gcloud compute <span class="se">\
 </span><span class="se"></span>  --source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0 <span class="se">\
 </span><span class="se"></span>  --target-tags<span class="o">=</span><span class="nv">$TARGET_TAG</span></code></pre></div>
 <h2 id="deploy-a-simple-app">Deploy a simple app</h2>
-<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nv">EXT_IP</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].networkInterfaces[0].accessConfigs[0].natIP&#39;</span><span class="k">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">EXT_IP</span><span class="o">=</span><span class="k">$(</span>gcloud compute instances list --format<span class="o">=</span>json <span class="p">|</span> jq -r <span class="s1">&#39;.[0].networkInterfaces[0].accessConfigs[0].natIP&#39;</span><span class="k">)</span>
 <span class="nb">echo</span> <span class="nv">$EXT_IP</span>
-<span class="nv">HOST</span><span class="o">=</span><span class="s2">&#34;test.</span><span class="si">${</span><span class="nv">EXT_IP</span><span class="si">}</span><span class="s2">.xip.io&#34;</span>
-<span class="nb">echo</span> <span class="nv">$HOST</span>
 
-curl https://ghostsquad.me/files/hello.yaml -o hello.yaml
-sed -i <span class="s2">&#34;s/__HOST__/</span><span class="si">${</span><span class="nv">HOST</span><span class="si">}</span><span class="s2">/g&#34;</span> hello.yaml
-kubectl apply -f hello.yaml</code></pre></div>
+kubectl apply -f https://ghostsquad.me/files/kubernetes-on-the-cheap-part-1/hello.yaml</code></pre></div>
+<p>You should now be able to visit the IP address in <code>$EXT_IP</code> and see something like this:</p>
+
+<pre><code>Hello, world!
+Version: 1.0.0
+Hostname: hello-567b7dcdc9-vgb8v
+</code></pre>
+
 <p>This works, but we have one major issue, and that&rsquo;s the node IP address will change every 24 hours because the instance is pre-emptible. (and also this means the <code>host</code> in the ingress will need to be updated every 24 hours)</p>
 
 <p>We&rsquo;ll address this in the next part of this series!</p>
@@ -226,6 +311,8 @@ kubectl apply -f hello.yaml</code></pre></div>
 <li>Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</li>
 <li>Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</li>
 </ul>
+
+<p>Head over to <a href="/posts/kubernetes-on-the-cheap-part-2/">part 2</a></p>
 ]]></content>
 		</item>
 		
