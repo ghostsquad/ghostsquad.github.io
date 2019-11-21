@@ -13,7 +13,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 
 
 <meta itemprop="datePublished" content="2019-11-16T17:49:17-08:00" />
-<meta itemprop="dateModified" content="2019-11-20T22:30:32-08:00" />
+<meta itemprop="dateModified" content="2019-11-20T22:41:48-08:00" />
 <meta itemprop="wordCount" content="1238">
 
 
@@ -25,7 +25,7 @@ I wanted to play around with Kubernetes for personal learning, and even some per
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-1/" />
 <meta property="article:published_time" content="2019-11-16T17:49:17-08:00" />
-<meta property="article:modified_time" content="2019-11-20T22:30:32-08:00" />
+<meta property="article:modified_time" content="2019-11-20T22:41:48-08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kubernetes on the Cheap - Part 1"/>
 <meta name="twitter:description" content="How to run Kubernetes for less than $6 per month?
@@ -297,11 +297,11 @@ Hostname: hello-567b7dcdc9-vgb8v
 
 <p>The problems which we need to address in the next part are:</p>
 
-<ul>
-<li>Setting up domain that points to the cluster, so that we don&rsquo;t have to update the ingress</li>
-<li>Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get pre-empted)</li>
-<li>Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</li>
-<li>Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</li>
+<ul class="task-list">
+<li><label><input type="checkbox" disabled class="task-list-item"> Setting up domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get pre-empted)</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</label></li>
 </ul>
 
 <p>Head over to <a href="/posts/kubernetes-on-the-cheap-part-2/">part 2</a></p>
