@@ -66,3 +66,7 @@ spec:
         volumeMounts:
         - name: cloud-dns-key
           mountPath: /var/secrets/google
+        resources:
+          requests:
+            cpu: 1m
+            memory: 10Mi
