@@ -32,6 +32,10 @@ repo_dir="$( cd "$( dirname "$0" )" && pwd )"
     git worktree add -B master public origin/master
 
     echo "Removing existing files"
+    (
+        cd public
+        git pull
+    )
     rm -rf public/*
 
     echo "Generating site"
