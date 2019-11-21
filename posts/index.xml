@@ -102,8 +102,8 @@ kubectl apply -f hello-part-2.yaml</code></pre></div>
 <p>It doesn&rsquo;t appear though that externalDNS is adding multiple A records (for each IP) when you have 2 nodes. This deserves some more research.</p>
 
 <ul class="task-list">
-<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
-<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get pre-empted)</label></li>
+<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up a domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
+<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get preempted)</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</label></li>
 </ul>
@@ -330,8 +330,8 @@ Hostname: hello-567b7dcdc9-vgb8v
 <p>The problems which we need to address in the next part are:</p>
 
 <ul class="task-list">
-<li><label><input type="checkbox" disabled class="task-list-item"> Setting up domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
-<li><label><input type="checkbox" disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get pre-empted)</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Setting up a domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get preempted)</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</label></li>
 </ul>
