@@ -14,8 +14,8 @@ The next step is going to require you to own a domain. I recommend namecheap. Yo
 
 
 <meta itemprop="datePublished" content="2019-11-18T09:47:28-08:00" />
-<meta itemprop="dateModified" content="2019-11-20T22:54:28-08:00" />
-<meta itemprop="wordCount" content="501">
+<meta itemprop="dateModified" content="2019-11-20T23:00:43-08:00" />
+<meta itemprop="wordCount" content="504">
 
 
 
@@ -27,7 +27,7 @@ The next step is going to require you to own a domain. I recommend namecheap. Yo
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ghostsquad.me/posts/kubernetes-on-the-cheap-part-2/" />
 <meta property="article:published_time" content="2019-11-18T09:47:28-08:00" />
-<meta property="article:modified_time" content="2019-11-20T22:54:28-08:00" />
+<meta property="article:modified_time" content="2019-11-20T23:00:43-08:00" />
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Kubernetes on the Cheap - Part 2"/>
 <meta name="twitter:description" content="If you haven&rsquo;t read part 1 yet, that&rsquo;s a good place to start.
@@ -175,8 +175,9 @@ kubectl apply -f hello-part-2.yaml</code></pre></div>
 <p>It doesn&rsquo;t appear though that externalDNS is adding multiple A records (for each IP) when you have 2 nodes. This deserves some more research.</p>
 
 <ul class="task-list">
-<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up a domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
-<li><label><input type="checkbox" checked disabled class="task-list-item"> Setting up <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get preempted)</label></li>
+<li><label><input type="checkbox" checked disabled class="task-list-item"> Snag a domain that points to the cluster, so that we don&rsquo;t have to update the ingress</label></li>
+<li><label><input type="checkbox" checked disabled class="task-list-item"> Deploy <a href="https://github.com/kubernetes-sigs/external-dns">external-dns</a> to automatically update our domain with the list of IPs of hosts (when the get preempted)</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> Deploy <a href="https://github.com/jetstack/cert-manager">cert-manager</a> to get HTTPS!</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="k8s-node-termination-handler">node-termination-handler</a> to further improve shutdowns</label></li>
 <li><label><input type="checkbox" disabled class="task-list-item"> Setup <a href="https://spotinst.com/pricing/">SpotInst</a> in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.</label></li>
 </ul>
@@ -202,7 +203,7 @@ kubectl apply -f hello-part-2.yaml</code></pre></div>
 					<line x1="16" y1="13" x2="8" y2="13"></line>
 					<line x1="16" y1="17" x2="8" y2="17"></line>
 					<polyline points="10 9 9 9 8 9"></polyline>
-				</svg>501 Words</p>
+				</svg>504 Words</p>
 			<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 					class="feather feather-calendar">
