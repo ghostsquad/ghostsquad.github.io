@@ -20,6 +20,7 @@ The next step is going to require you to own a domain. I recommend [namecheap](h
 - [Create a DNS Zone](#create-a-dns-zone)
 - [Deploy External DNS Controller](#deploy-external-dns-controller)
 - [Edit the hello app to include the domain, and updated ttl](#edit-the-hello-app-to-include-the-domain-and-updated-ttl)
+- [Conclusion](#conclusion)
 
 To make your life easier, I've variablized the commands in this post, so that you can simply set the variables, then copy/paste the commands without much trouble.
 
@@ -37,6 +38,14 @@ gcloud beta dns \
   --description="${DOMAIN}" \
   --dns-name="${DOMAIN}."
 ```
+
+Once the DNS zone is created, you need to update your domain registrar with the google name servers.
+
+When viewing the zone, you should see an `NS` record with values like `ns-cloud-<??>.googledomains.com`.
+
+![google cloud zone records](https://cloud.google.com/dns/images/zone-records.png)
+
+If you chose to use namecheap, here's [how to update DNS on namecheap.com](https://www.namecheap.com/support/knowledgebase/article.aspx/767/10/how-to-change-dns-for-a-domain).
 
 ## Deploy External DNS Controller
 
@@ -96,4 +105,15 @@ sed -i "s/__DOMAIN__/${DOMAIN}/g" hello-part-2.yaml
 kubectl apply -f hello-part-2.yaml
 ```
 
+## Conclusion
 
+We deployed external DNS so that it can keep the cluster updated with an IP address for your domain name. I even watched it go to work by scaling up to 2 nodes, then scaling back down.
+
+It doesn't appear though that externalDNS is adding multiple A records (for each IP) when you have 2 nodes. This deserves some more research.
+
+- [x] Setting up domain that points to the cluster, so that we don't have to update the ingress
+- [x] Setting up [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get pre-empted)
+- [ ] Setup [node-termination-handler](k8s-node-termination-handler) to further improve shutdowns
+- [ ] Setup [SpotInst](https://spotinst.com/pricing/) in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.
+
+Stay tuned for Part 3!

@@ -181,9 +181,9 @@ We've deployed a cluster to GKE running a single node. We deployed nginx ingress
 
 The problems which we need to address in the next part are:
 
-- Setting up domain that points to the cluster, so that we don't have to update the ingress
-- Setting up [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get pre-empted)
-- Setup [node-termination-handler](k8s-node-termination-handler) to further improve shutdowns
-- Setup [SpotInst](https://spotinst.com/pricing/) in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.
+- [ ] Setting up domain that points to the cluster, so that we don't have to update the ingress
+- [ ] Setting up [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get pre-empted)
+- [ ] Setup [node-termination-handler](k8s-node-termination-handler) to further improve shutdowns
+- [ ] Setup [SpotInst](https://spotinst.com/pricing/) in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.
 
 Head over to [part 2]({{< relref "posts/kubernetes-on-the-cheap-part-2.md" >}})
