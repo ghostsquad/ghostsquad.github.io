@@ -39,9 +39,10 @@ metadata:
   name: hello
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    external-dns.alpha.kubernetes.io/ttl: "5"
 spec:
   rules:
-  - host: __HOST__
+  - host: __DOMAIN__
     http:
       paths:
       - path: /

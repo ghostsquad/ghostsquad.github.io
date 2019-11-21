@@ -44,6 +44,8 @@ or
 echo "alias k=kubectl" >> $HOME/.bashrc
 ```
 
+To make your life easier, I've variablized the commands in this post, so that you can simply set the variables, then copy/paste the commands without much trouble.
+
 ## Create a GKE Cluster
 
 GKE (Google Kubernetes Engine) is actually FREE on GCP... well the master nodes are. You can create a cluster without any worker nodes at no cost. That's the next step. First, navigate to [https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap](https://console.cloud.google.com/kubernetes/list?project=kubernetes-on-the-cheap) but replacing the `project` with your own project name. Google has to enable the `Kubernetes Engine API`, and it takes a few minutes.
@@ -62,14 +64,15 @@ echo "MY_HOME_IP=${MY_HOME_IP}"
 Run this from the Cloud Shell console
 
 ```bash
-PROJECT_NAME="kubernetes-on-the-cheap"
-REGION="us-west1"
-ZONE_ID="a"
-ZONE="${REGION}-${ZONE_ID}"
+export PROJECT_NAME="kubernetes-on-the-cheap"
+export CLUSTER_NAME="hobby-1"
+export REGION="us-west1"
+export ZONE_ID="a"
+export ZONE="${REGION}-${ZONE_ID}"
 
 gcloud beta container \
   --project "${PROJECT_NAME}" \
-  clusters create "hobby-1" \
+  clusters create "${CLUSTER_NAME}" \
   --zone "${ZONE}" \
   --no-enable-basic-auth \
   --release-channel "regular" \
@@ -131,13 +134,13 @@ The following manifests are derived from the [manifests online](https://kubernet
 Run this to deploy the nginx ingress controller:
 
 ```bash
-kubectl apply -f https://ghostsquad.me/files/nginx-ingress-controller.yaml
+kubectl apply -f {{< staticref "files/kubernetes-on-the-cheap-part-1/nginx-ingress-controller.yaml" >}}
 ```
 
 ## Create a firewall rule to allow traffic to the nodes
 
 ```bash
-TARGET_TAG=$(gcloud compute instances list --format=json | jq -r '.[0].tags.items[0]')
+export TARGET_TAG=$(gcloud compute instances list --format=json | jq -r '.[0].tags.items[0]')
 
 gcloud compute \
   --project=kubernetes-on-the-cheap \
@@ -154,14 +157,18 @@ gcloud compute \
 ## Deploy a simple app
 
 ```bash
-EXT_IP=$(gcloud compute instances list --format=json | jq -r '.[0].networkInterfaces[0].accessConfigs[0].natIP')
+export EXT_IP=$(gcloud compute instances list --format=json | jq -r '.[0].networkInterfaces[0].accessConfigs[0].natIP')
 echo $EXT_IP
-HOST="test.${EXT_IP}.xip.io"
-echo $HOST
 
-curl https://ghostsquad.me/files/hello.yaml -o hello.yaml
-sed -i "s/__HOST__/${HOST}/g" hello.yaml
-kubectl apply -f hello.yaml
+kubectl apply -f {{< staticref "files/kubernetes-on-the-cheap-part-1/hello.yaml" >}}
+```
+
+You should now be able to visit the IP address in `$EXT_IP` and see something like this:
+
+```
+Hello, world!
+Version: 1.0.0
+Hostname: hello-567b7dcdc9-vgb8v
 ```
 
 This works, but we have one major issue, and that's the node IP address will change every 24 hours because the instance is pre-emptible. (and also this means the `host` in the ingress will need to be updated every 24 hours)
@@ -178,3 +185,5 @@ The problems which we need to address in the next part are:
 - Setting up [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get pre-empted)
 - Setup [node-termination-handler](k8s-node-termination-handler) to further improve shutdowns
 - Setup [SpotInst](https://spotinst.com/pricing/) in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.
+
+Head over to [part 2]({{< relref "posts/kubernetes-on-the-cheap-part-2.md" >}})
