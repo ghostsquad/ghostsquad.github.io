@@ -111,8 +111,9 @@ We deployed external DNS so that it can keep the cluster updated with an IP addr
 
 It doesn't appear though that externalDNS is adding multiple A records (for each IP) when you have 2 nodes. This deserves some more research.
 
-- [x] Setting up a domain that points to the cluster, so that we don't have to update the ingress
-- [x] Setting up [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get preempted)
+- [x] Snag a domain that points to the cluster, so that we don't have to update the ingress
+- [x] Deploy [external-dns](https://github.com/kubernetes-sigs/external-dns) to automatically update our domain with the list of IPs of hosts (when the get preempted)
+- [ ] Deploy [cert-manager](https://github.com/jetstack/cert-manager) to get HTTPS!
 - [ ] Setup [node-termination-handler](k8s-node-termination-handler) to further improve shutdowns
 - [ ] Setup [SpotInst](https://spotinst.com/pricing/) in order to handle rolling instances on a regular basis in a controlled way, and scaling the cluster temporarily while doing so.
 
