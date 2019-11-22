@@ -188,7 +188,7 @@ subjects:
 ---
 
 apiVersion: apps/v1
-kind: Daemonset
+kind: DaemonSet
 metadata:
   name: nginx-ingress-controller
   namespace: ingress-nginx
